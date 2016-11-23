@@ -89,6 +89,8 @@ void switchcpu(ThreadContext *tc);
 void workbegin(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 void workend(ThreadContext *tc, uint64_t workid, uint64_t threadid);
 void togglesync(ThreadContext *tc);
+void add_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata);     //Approx
+void remove_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata);  //Approx
 
 } // namespace PseudoInst
 

@@ -578,4 +578,52 @@ let {{
     header_output += BasicDeclare.subst(m5workendIop)
     decoder_output += BasicConstructor.subst(m5workendIop)
     exec_output += PredOpExecute.subst(m5workendIop)
+
+    m5add_approx_code = '''
+    PseudoInst::add_approx(xc->tcBase(), join32to64(R1, R0), join32to64(R3, R2), join32to64(R3, R2));
+    '''
+
+    m5add_approx_code64 = '''
+    PseudoInst::add_approx(xc->tcBase(), X0, X1, X2);
+    '''
+
+    m5add_approxIop = InstObjParams("m5add_approx", "M5add_approx", "PredOp",
+                           { "code": m5add_approx_code,
+                             "predicate_test": predicateTest },
+                             ["IsNonSpeculative", "IsUnverifiable"])
+    header_output += BasicDeclare.subst(m5add_approxIop)
+    decoder_output += BasicConstructor.subst(m5add_approxIop)
+    exec_output += PredOpExecute.subst(m5add_approxIop)
+
+    m5add_approxIop = InstObjParams("m5add_approx", "M5add_approx64", "PredOp",
+                           { "code": m5add_approx_code64,
+                             "predicate_test": predicateTest },
+                             ["IsNonSpeculative", "IsUnverifiable"])
+    header_output += BasicDeclare.subst(m5add_approxIop)
+    decoder_output += BasicConstructor.subst(m5add_approxIop)
+    exec_output += PredOpExecute.subst(m5add_approxIop)
+
+    m5remove_approx_code = '''
+    PseudoInst::remove_approx(xc->tcBase(), join32to64(R1, R0), join32to64(R3, R2), join32to64(R3, R2));
+    '''
+
+    m5remove_approx_code64 = '''
+    PseudoInst::remove_approx(xc->tcBase(), X0, X1, X2);
+    '''
+
+    m5remove_approxIop = InstObjParams("m5remove_approx", "M5remove_approx", "PredOp",
+                           { "code": m5remove_approx_code,
+                             "predicate_test": predicateTest },
+                             ["IsNonSpeculative", "IsUnverifiable"])
+    header_output += BasicDeclare.subst(m5remove_approxIop)
+    decoder_output += BasicConstructor.subst(m5remove_approxIop)
+    exec_output += PredOpExecute.subst(m5remove_approxIop)
+
+    m5remove_approxIop = InstObjParams("m5remove_approx", "M5remove_approx64", "PredOp",
+                           { "code": m5remove_approx_code64,
+                             "predicate_test": predicateTest },
+                             ["IsNonSpeculative", "IsUnverifiable"])
+    header_output += BasicDeclare.subst(m5remove_approxIop)
+    decoder_output += BasicConstructor.subst(m5remove_approxIop)
+    exec_output += PredOpExecute.subst(m5remove_approxIop)
 }};

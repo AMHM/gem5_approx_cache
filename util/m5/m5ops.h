@@ -67,8 +67,9 @@
 #define addsymbol_func          0x53
 #define panic_func              0x54
 
-#define reserved2_func          0x56 // Reserved for user
-#define reserved3_func          0x57 // Reserved for user
+#define add_approx_func         0x56 // Approx
+#define remove_approx_func      0x57 // Approx
+
 #define reserved4_func          0x58 // Reserved for user
 #define reserved5_func          0x59 // Reserved for user
 
@@ -121,6 +122,8 @@
     M5OP(m5_switchcpu, switchcpu_func, 0);              \
     M5OP(m5_addsymbol, addsymbol_func, 0);              \
     M5OP(m5_panic, panic_func, 0);                      \
+    M5OP(m5_add_approx,add_approx_func, 0);             \
+    M5OP(m5_remove_approx, remove_approx_func, 0);      \
     M5OP(m5_work_begin, work_begin_func, 0);            \
     M5OP(m5_work_end, work_end_func, 0);                \
     M5OP(m5_togglesync, togglesync_func, 0);

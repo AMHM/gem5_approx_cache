@@ -195,8 +195,14 @@ pseudoInst(ThreadContext *tc, uint8_t func, uint8_t subfunc)
         break;
 
       case 0x55: // annotate_func
-      case 0x56: // reserved2_func
-      case 0x57: // reserved3_func
+      case 0x56: // add_approx_func
+        add_approx(tc, args[0], args[1], args[2]);
+        break;
+
+      case 0x57: // remove_approx_func
+        remove_approx(tc, args[0], args[1], args[2]);
+        break;
+
       case 0x58: // reserved4_func
       case 0x59: // reserved5_func
         warn("Unimplemented m5 op (0x%x)\n", func);
@@ -704,6 +710,19 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
             exitSimLoop("work items exit count reached");
         }
     }
+}
+
+void
+add_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
+{
+    DPRINTF(PseudoInst, "PseudoInst::add_approx(%d, %d, %d)\n", start, end, metadata);
+}
+
+void
+remove_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
+{
+    DPRINTF(PseudoInst, "PseudoInst::remove_approx(%d, %d, %d)\n", start, end, metadata);
+
 }
 
 } // namespace PseudoInst
