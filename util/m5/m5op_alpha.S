@@ -74,6 +74,9 @@ func:
 #define ADDSYMBOL(r1,r2) INST(m5_op, r1, r2, addsymbol_func)
 #define PANIC INST(m5_op, 0, 0, panic_func)
 
+#define ADD_APPROX(r1, r2) INST(m5_op, r1, r2, add_approx_func)       //Approx
+#define REMOVE_APPROX(r1, r2) INST(m5_op, r1, r2, remove_approx_func) //Approx
+
 #define AN_BSM INST(m5_op, an_bsm, 0, annotate_func)
 #define AN_ESM INST(m5_op, an_esm, 0, annotate_func)
 #define AN_BEGIN INST(m5_op, an_begin, 0, annotate_func)
@@ -113,6 +116,9 @@ SIMPLE_OP(m5_debugbreak, DEBUGBREAK)
 SIMPLE_OP(m5_switchcpu, SWITCHCPU)
 SIMPLE_OP(m5_addsymbol, ADDSYMBOL(16, 17))
 SIMPLE_OP(m5_panic, PANIC)
+
+SIMPLE_OP(m5_add_approx, ADD_APPROX(16, 17))         //Approx
+SIMPLE_OP(m5_remove_approx, REMOVE_APPROX(16, 17))   //Approx
 
 SIMPLE_OP(m5a_bsm, AN_BSM)
 SIMPLE_OP(m5a_esm, AN_ESM)
