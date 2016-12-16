@@ -63,8 +63,8 @@ void m5_panic(void);
 void m5_work_begin(uint64_t workid, uint64_t threadid);
 void m5_work_end(uint64_t workid, uint64_t threadid);
 
-void m5_add_approx(uint64_t start, uint64_t end, uint64_t metadata);     //Approx
-void m5_remove_approx(uint64_t start, uint64_t end, uint64_t metadata);  //Approx
+void m5_add_approx(uint32_t start, uint32_t end, uint32_t metadata);     //Approx
+void m5_remove_approx(uint32_t start, uint32_t end, uint32_t metadata);  //Approx
 
 // These operations are for critical path annotation
 void m5a_bsm(char *sm, const void *id, int flags);

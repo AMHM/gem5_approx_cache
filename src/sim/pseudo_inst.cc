@@ -713,13 +713,13 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
 }
 
 void
-add_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
+add_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
 {
     DPRINTF(PseudoInst, "PseudoInst::add_approx(%d, %d, %d)\n", start, end, metadata);
 }
 
 void
-remove_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
+remove_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
 {
     DPRINTF(PseudoInst, "PseudoInst::remove_approx(%d, %d, %d)\n", start, end, metadata);
 
