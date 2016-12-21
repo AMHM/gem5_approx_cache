@@ -98,7 +98,7 @@ class BaseCache : public MemObject
         NUM_BLOCKED_CAUSES
     };
 
-  protected:
+  public:
 
     /**
      * A cache master port is used for the memory-side port of the
@@ -160,6 +160,10 @@ class BaseCache : public MemObject
         void clearBlocked();
 
         bool isBlocked() const { return blocked; }
+
+        MemObject* getOwner() {
+            return &owner;
+        }
 
       protected:
 

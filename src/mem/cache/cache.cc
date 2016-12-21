@@ -66,6 +66,7 @@
 
 Cache::Cache(const CacheParams *p)
     : BaseCache(p, p->system->cacheLineSize()),
+      myPageTable(nullptr),
       tags(p->tags),
       prefetcher(p->prefetcher),
       doFastWrites(true),
@@ -2541,6 +2542,18 @@ Cache::unserialize(CheckpointIn &cp)
               "in the classic memory system. Please remove any caches or "
               " drain them properly before taking checkpoints.\n");
     }
+}
+
+bool
+Cache::havePageTable()
+{
+    return (myPageTable == nullptr);
+}
+
+void
+Cache::setPageTable(FuncPageTable *pt)
+{
+    myPageTable = pt;
 }
 
 ///////////////

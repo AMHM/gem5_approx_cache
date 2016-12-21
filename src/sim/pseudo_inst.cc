@@ -76,6 +76,7 @@
 #include "sim/stats.hh"
 #include "sim/system.hh"
 #include "sim/vptr.hh"
+#include "mem/cache/cache.hh"
 
 using namespace std;
 
@@ -716,6 +717,12 @@ void
 add_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
 {
     DPRINTF(PseudoInst, "PseudoInst::add_approx(%d, %d, %d)\n", start, end, metadata);
+
+    BaseCPU *cpu = tc->getCpuPtr();
+    BaseCache::CacheSlavePort& l1dcache_port = dynamic_cast<BaseCache::CacheSlavePort&>(cpu->getMasterPort("dcache_port", 0).getSlavePort());
+    Cache *l1dcache = dynamic_cast<Cache*>(l1dcache_port.getOwner());
+    FuncPageTable *pt = dynamic_cast<FuncPageTable*>(tc->getProcessPtr()->pTable);
+    l1dcache->setPageTable(pt);
 }
 
 void
@@ -723,6 +730,11 @@ remove_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata
 {
     DPRINTF(PseudoInst, "PseudoInst::remove_approx(%d, %d, %d)\n", start, end, metadata);
 
+    BaseCPU *cpu = tc->getCpuPtr();
+    BaseCache::CacheSlavePort& l1dcache_port = dynamic_cast<BaseCache::CacheSlavePort&>(cpu->getMasterPort("dcache_port", 0).getSlavePort());
+    Cache *l1dcache = dynamic_cast<Cache*>(l1dcache_port.getOwner());
+    FuncPageTable *pt = dynamic_cast<FuncPageTable*>(tc->getProcessPtr()->pTable);
+    l1dcache->setPageTable(pt);
 }
 
 } // namespace PseudoInst

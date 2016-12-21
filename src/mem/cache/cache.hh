@@ -58,6 +58,7 @@
 #include "mem/cache/blk.hh"
 #include "mem/cache/mshr.hh"
 #include "mem/cache/tags/base.hh"
+#include "mem/page_table.hh"
 #include "params/Cache.hh"
 #include "sim/eventq.hh"
 
@@ -187,6 +188,8 @@ class Cache : public BaseCache
         MemSidePort(const std::string &_name, Cache *_cache,
                     const std::string &_label);
     };
+
+    FuncPageTable *myPageTable;
 
     /** Tag and data Storage */
     BaseTags *tags;
@@ -569,6 +572,9 @@ class Cache : public BaseCache
      */
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
+
+    bool havePageTable();
+    void setPageTable(FuncPageTable *pt);
 };
 
 /**
