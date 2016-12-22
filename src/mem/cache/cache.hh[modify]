@@ -58,7 +58,6 @@
 #include "mem/cache/blk.hh"
 #include "mem/cache/mshr.hh"
 #include "mem/cache/tags/base.hh"
-#include "mem/page_table.hh"
 #include "params/Cache.hh"
 #include "sim/eventq.hh"
 
@@ -72,23 +71,6 @@ class BasePrefetcher;
  */
 class Cache : public BaseCache
 {
-	//AMHM Start
-  public:
-	class Approximation {
-	public:
-		Approximation();
-		void appTableInsert(Addr start, Addr end, uint32_t reliabilityLevel);
-		void appTableRemove(Addr start, Addr end, uint32_t reliabilityLevel);
-		uint32_t appTableCheck(Addr address);
-		struct Table {
-			Addr start;
-			Addr end;
-			uint32_t reliabilityLevel;
-		} appTable[1000];
-		int lastentryIndex;
-	};
-	Approximation approxTable;
-	//AMHM End
   public:
 
     /** A typedef for a list of CacheBlk pointers. */
@@ -212,8 +194,6 @@ class Cache : public BaseCache
     uint8_t new_data[64];
     uint8_t old_data[64];
     //AMHM End
-    
-    FuncPageTable *myPageTable;
 
     /** Tag and data Storage */
     BaseTags *tags;
@@ -596,9 +576,6 @@ class Cache : public BaseCache
      */
     void serialize(CheckpointOut &cp) const override;
     void unserialize(CheckpointIn &cp) override;
-
-    bool havePageTable();
-    void setPageTable(FuncPageTable *pt);
 };
 
 /**

@@ -76,7 +76,6 @@
 #include "sim/stats.hh"
 #include "sim/system.hh"
 #include "sim/vptr.hh"
-#include "mem/cache/cache.hh"
 
 using namespace std;
 
@@ -714,15 +713,8 @@ workend(ThreadContext *tc, uint64_t workid, uint64_t threadid)
 }
 
 void
-add_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
+add_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
 {
-    DPRINTF(PseudoInst, "PseudoInst::add_approx(%d, %d, %d)\n", start, end, metadata);
-
-    BaseCPU *cpu = tc->getCpuPtr();
-    BaseCache::CacheSlavePort& l1dcache_port = dynamic_cast<BaseCache::CacheSlavePort&>(cpu->getMasterPort("dcache_port", 0).getSlavePort());
-    Cache *l1dcache = dynamic_cast<Cache*>(l1dcache_port.getOwner());
-    FuncPageTable *pt = dynamic_cast<FuncPageTable*>(tc->getProcessPtr()->pTable);
-    l1dcache->setPageTable(pt);
     //AMHM Start
     if((end - start + 1) < tc->getCpuPtr()->system->cacheLineSize())
         return;
@@ -745,21 +737,17 @@ add_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
     }
     //Pointing to the next block which compeletly filled by the address range contents
     start = start + tc->getCpuPtr()->system->cacheLineSize();
-    l1dcache->approxTable.appTableInsert((Addr) start, (Addr) end, metadata);
-    //AMHM End
+    tc->getProcessPtr()->pTable->approxTable.appTableUpdate(start, end, (uint64_t) 1);
+    DPRINTF(PseudoInst, "PseudoInst::add_approx(%d, %d, %d) and reliability level is: %ld", start, end, metadata);
 }
-
 void
-remove_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
+remove_approx(ThreadContext *tc, uint64_t start, uint64_t end, uint64_t metadata)
 {
+    //AMHM Start
+    tc->getProcessPtr()->pTable->approxTable.appTableUpdate(start, end, 0);
+    //AMHM End
     DPRINTF(PseudoInst, "PseudoInst::remove_approx(%d, %d, %d)\n", start, end, metadata);
 
-    BaseCPU *cpu = tc->getCpuPtr();
-    BaseCache::CacheSlavePort& l1dcache_port = dynamic_cast<BaseCache::CacheSlavePort&>(cpu->getMasterPort("dcache_port", 0).getSlavePort());
-    Cache *l1dcache = dynamic_cast<Cache*>(l1dcache_port.getOwner());
-    FuncPageTable *pt = dynamic_cast<FuncPageTable*>(tc->getProcessPtr()->pTable);
-    l1dcache->setPageTable(pt);
-    l1dcache->approxTable.appTableRemove((Addr) start, (Addr) end, 0);
 }
 
 } // namespace PseudoInst

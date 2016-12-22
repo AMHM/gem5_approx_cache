@@ -52,6 +52,14 @@
 #include "base/intmath.hh"
 #include "sim/core.hh"
 
+//AMHM Start
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include "base/callback.hh"
+//AMHM End
+
 using namespace std;
 
 BaseSetAssoc::BaseSetAssoc(const Params *p)
@@ -69,6 +77,242 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     if (assoc <= 0) {
         fatal("associativity must be greater than zero");
     }
+
+    //AMHM Start
+    FILE * STTRAMCellConfig;
+    STTRAMCellConfig = fopen (".//configs//common//STT-RAMCacheConfig.cfg", "r");
+    char stringTemp0[500];
+    char stringTemp1[500];
+    double value1 = 0;
+    double value2 = 0;
+    if (STTRAMCellConfig==NULL) {
+      printf("The STT-RAM cache config file could not be opened!\n");
+    }
+    else {
+        if (fgets(stringTemp0, sizeof(stringTemp0), STTRAMCellConfig) != NULL) {
+            while(STTRAMCellConfig) {
+                if(fscanf(STTRAMCellConfig, "%s %le %le %s", stringTemp0, &value1, &value2, stringTemp1) == 4) {
+                    if(!strcmp(stringTemp0, "L1IreadErrorRateLevel0")) {
+                        if(name() == "system.cpu.icache.tags")
+                            readErrorRateLevel0 = value1;
+                            readErrorRateLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel0")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            readErrorRateLevel0 = value1;
+                            readErrorRateLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2readErrorRateLevel0")) {
+                        if(name() == "system.l2.tags")
+                            readErrorRateLevel0 = value1;
+                            readErrorRateLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel0")) {
+                        if(name() == "system.cpu.icache.tags")
+                            writeErrorRateLevel0 = value1;
+                            writeErrorRateLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel0")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            writeErrorRateLevel0 = value1;
+                            writeErrorRateLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel0")) {
+                        if(name() == "system.l2.tags")
+                            writeErrorRateLevel0 = value1;
+                            writeErrorRateLevel0Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel1")) {
+                        if(name() == "system.cpu.icache.tags")
+                            readErrorRateLevel1 = value1;
+                            readErrorRateLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel1")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            readErrorRateLevel1 = value1;
+                            readErrorRateLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2readErrorRateLevel1")) {
+                        if(name() == "system.l2.tags")
+                            readErrorRateLevel1 = value1;
+                            readErrorRateLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel1")) {
+                        if(name() == "system.cpu.icache.tags")
+                            writeErrorRateLevel1 = value1;
+                            writeErrorRateLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel1")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            writeErrorRateLevel1 = value1;
+                            writeErrorRateLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel1")) {
+                        if(name() == "system.l2.tags")
+                            writeErrorRateLevel1 = value1;
+                            writeErrorRateLevel1Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel2")) {
+                        if(name() == "system.cpu.icache.tags")
+                            readErrorRateLevel2 = value1;
+                            readErrorRateLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel2")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            readErrorRateLevel2 = value1;
+                            readErrorRateLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2readErrorRateLevel2")) {
+                        if(name() == "system.l2.tags")
+                            readErrorRateLevel2 = value1;
+                            readErrorRateLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel2")) {
+                        if(name() == "system.cpu.icache.tags")
+                            writeErrorRateLevel2 = value1;
+                            writeErrorRateLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel2")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            writeErrorRateLevel2 = value1;
+                            writeErrorRateLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel2")) {
+                        if(name() == "system.l2.tags")
+                            writeErrorRateLevel2 = value1;
+                            writeErrorRateLevel2Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel3")) {
+                        if(name() == "system.cpu.icache.tags")
+                            readErrorRateLevel3 = value1;
+                            readErrorRateLevel3Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel3")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            readErrorRateLevel3 = value1;
+                            readErrorRateLevel3Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2readErrorRateLevel3")) {
+                        if(name() == "system.l2.tags")
+                            readErrorRateLevel3 = value1;
+                            readErrorRateLevel3Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel3")) {
+                        if(name() == "system.cpu.icache.tags")
+                            writeErrorRateLevel3 = value1;
+                            writeErrorRateLevel3Var = value2;
+                    } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel3")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            writeErrorRateLevel3 = value1;
+                            writeErrorRateLevel3Var = value2;
+                    } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel3")) {
+                        if(name() == "system.l2.tags")
+                            writeErrorRateLevel3 = value1;
+                            writeErrorRateLevel3Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel0")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicReadEnergyConsumptionLevel0 = value1;
+                            dynamicReadEnergyConsumptionLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel0")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicReadEnergyConsumptionLevel0 = value1;
+                            dynamicReadEnergyConsumptionLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel0")) {
+                        if(name() == "system.l2.tags")
+                            dynamicReadEnergyConsumptionLevel0 = value1;
+                            dynamicReadEnergyConsumptionLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel0")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicWriteEnergyConsumptionLevel0 = value1;
+                            dynamicWriteEnergyConsumptionLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel0")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicWriteEnergyConsumptionLevel0 = value1;
+                            dynamicWriteEnergyConsumptionLevel0Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel0")) {
+                        if(name() == "system.l2.tags")
+                            dynamicWriteEnergyConsumptionLevel0 = value1;
+                            dynamicWriteEnergyConsumptionLevel0Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel1")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicReadEnergyConsumptionLevel1 = value1;
+                            dynamicReadEnergyConsumptionLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel1")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicReadEnergyConsumptionLevel1 = value1;
+                            dynamicReadEnergyConsumptionLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel1")) {
+                        if(name() == "system.l2.tags")
+                            dynamicReadEnergyConsumptionLevel1 = value1;
+                            dynamicReadEnergyConsumptionLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel1")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicWriteEnergyConsumptionLevel1 = value1;
+                            dynamicWriteEnergyConsumptionLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel1")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicWriteEnergyConsumptionLevel1 = value1;
+                            dynamicWriteEnergyConsumptionLevel1Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel1")) {
+                        if(name() == "system.l2.tags")
+                            dynamicWriteEnergyConsumptionLevel1 = value1;
+                            dynamicWriteEnergyConsumptionLevel1Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel2")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel2")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel2")) {
+                        if(name() == "system.l2.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel2")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel2")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel2")) {
+                        if(name() == "system.l2.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    }
+
+                    else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel3")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel3")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel3")) {
+                        if(name() == "system.l2.tags")
+                            dynamicReadEnergyConsumptionLevel2 = value1;
+                            dynamicReadEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel3")) {
+                        if(name() == "system.cpu.icache.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel3")) {
+                        if(name() == "system.cpu.dcache.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel3")) {
+                        if(name() == "system.l2.tags")
+                            dynamicWriteEnergyConsumptionLevel2 = value1;
+                            dynamicWriteEnergyConsumptionLevel2Var = value2;
+                    }
+                    else {
+                            printf("Errors in reading STT-RAM cache config file!\n");
+                            break;
+                    }
+                }
+                else
+                    break;
+            }
+            fclose(STTRAMCellConfig);
+        } 
+        else
+            printf("Errors in reading STT-RAM cache config file!\n");
+    }
+    //AMHM End
 
     blkMask = blkSize - 1;
     setShift = floorLog2(blkSize);
@@ -110,6 +354,141 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
             sets[i].blks[j]=blk;
             blk->set = i;
             blk->way = j;
+
+            //AMHM Start
+            blk->randSeed = i * j;
+            srand(blk->randSeed); //each block has its own seed number!
+            for (int t = 0; t < (blkSize * 8); ++t)
+            {              
+              //readErrorRateLevel0
+              if ((rand()%100) >= 50) {
+                blk->readErrorRateLevel0[t] = readErrorRateLevel0 + (((double) (rand() % 100) / 100) * readErrorRateLevel0Var) * readErrorRateLevel0;
+                
+              } else {
+                blk->readErrorRateLevel0[t] = readErrorRateLevel0 + (((double) (rand() % 100) / 100) * readErrorRateLevel0Var) * readErrorRateLevel0;
+              }
+
+              //readErrorRateLevel1
+              if ((rand()%100) >= 50) {
+                blk->readErrorRateLevel1[t] = readErrorRateLevel1 + (((double) (rand() % 100) / 100) * readErrorRateLevel1Var) * readErrorRateLevel1;
+                
+              } else {
+                blk->readErrorRateLevel1[t] = readErrorRateLevel1 + (((double) (rand() % 100) / 100) * readErrorRateLevel1Var) * readErrorRateLevel1;
+              }
+
+              //readErrorRateLevel2
+              if ((rand()%100) >= 50) {
+                blk->readErrorRateLevel2[t] = readErrorRateLevel2 + (((double) (rand() % 100) / 100) * readErrorRateLevel2Var) * readErrorRateLevel2;
+                
+              } else {
+                blk->readErrorRateLevel2[t] = readErrorRateLevel2 + (((double) (rand() % 100) / 100) * readErrorRateLevel2Var) * readErrorRateLevel2;
+              }
+
+              //readErrorRateLevel3
+              if ((rand()%100) >= 50) {
+                blk->readErrorRateLevel3[t] = readErrorRateLevel3 + (((double) (rand() % 100) / 100) * readErrorRateLevel3Var) * readErrorRateLevel3;
+                
+              } else {
+                blk->readErrorRateLevel3[t] = readErrorRateLevel3 + (((double) (rand() % 100) / 100) * readErrorRateLevel3Var) * readErrorRateLevel3;
+              }
+
+              //writeErrorRateLevel0
+              if ((rand()%100) >= 50) {
+                blk->writeErrorRateLevel0[t] = writeErrorRateLevel0 + (((double) (rand() % 100) / 100) * writeErrorRateLevel0Var) * writeErrorRateLevel0;
+                
+              } else {
+                blk->writeErrorRateLevel0[t] = writeErrorRateLevel0 + (((double) (rand() % 100) / 100) * writeErrorRateLevel0Var) * writeErrorRateLevel0;
+              }
+
+              //writeErrorRateLevel1
+              if ((rand()%100) >= 50) {
+                blk->writeErrorRateLevel1[t] = writeErrorRateLevel1 + (((double) (rand() % 100) / 100) * writeErrorRateLevel1Var) * writeErrorRateLevel1;
+                
+              } else {
+                blk->writeErrorRateLevel1[t] = writeErrorRateLevel1 + (((double) (rand() % 100) / 100) * writeErrorRateLevel1Var) * writeErrorRateLevel1;
+              }
+
+              //writeErrorRateLevel2
+              if ((rand()%100) >= 50) {
+                blk->writeErrorRateLevel2[t] = writeErrorRateLevel2 + (((double) (rand() % 100) / 100) * writeErrorRateLevel2Var) * writeErrorRateLevel2;
+                
+              } else {
+                blk->writeErrorRateLevel2[t] = writeErrorRateLevel2 + (((double) (rand() % 100) / 100) * writeErrorRateLevel2Var) * writeErrorRateLevel2;
+              }
+
+              //writeErrorRateLevel3
+              if ((rand()%100) >= 50) {
+                blk->writeErrorRateLevel3[t] = writeErrorRateLevel3 + (((double) (rand() % 100) / 100) * writeErrorRateLevel3Var) * writeErrorRateLevel3;
+                
+              } else {
+                blk->writeErrorRateLevel3[t] = writeErrorRateLevel3 + (((double) (rand() % 100) / 100) * writeErrorRateLevel3Var) * writeErrorRateLevel3;
+              }
+
+              //dynamicReadEnergyConsumptionLevel0
+              if ((rand()%100) >= 50) {
+                blk->dynamicReadEnergyConsumptionLevel0[t] = dynamicReadEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel0Var) * dynamicReadEnergyConsumptionLevel0;
+                
+              } else {
+                blk->dynamicReadEnergyConsumptionLevel0[t] = dynamicReadEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel0Var) * dynamicReadEnergyConsumptionLevel0;
+              }
+
+              //dynamicReadEnergyConsumptionLevel1
+              if ((rand()%100) >= 50) {
+                blk->dynamicReadEnergyConsumptionLevel1[t] = dynamicReadEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel1Var) * dynamicReadEnergyConsumptionLevel1;
+                
+              } else {
+                blk->dynamicReadEnergyConsumptionLevel1[t] = dynamicReadEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel1Var) * dynamicReadEnergyConsumptionLevel1;
+              }
+
+              //dynamicReadEnergyConsumptionLevel2
+              if ((rand()%100) >= 50) {
+                blk->dynamicReadEnergyConsumptionLevel2[t] = dynamicReadEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel2Var) * dynamicReadEnergyConsumptionLevel2;
+                
+              } else {
+                blk->dynamicReadEnergyConsumptionLevel2[t] = dynamicReadEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel2Var) * dynamicReadEnergyConsumptionLevel2;
+              }
+
+              //dynamicReadEnergyConsumptionLevel3
+              if ((rand()%100) >= 50) {
+                blk->dynamicReadEnergyConsumptionLevel3[t] = dynamicReadEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel3Var) * dynamicReadEnergyConsumptionLevel3;
+                
+              } else {
+                blk->dynamicReadEnergyConsumptionLevel3[t] = dynamicReadEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel3Var) * dynamicReadEnergyConsumptionLevel3;
+              }
+
+              //dynamicWriteEnergyConsumptionLevel0
+              if ((rand()%100) >= 50) {
+                blk->dynamicWriteEnergyConsumptionLevel0[t] = dynamicWriteEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel0Var) * dynamicWriteEnergyConsumptionLevel0;
+                
+              } else {
+                blk->dynamicWriteEnergyConsumptionLevel0[t] = dynamicWriteEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel0Var) * dynamicWriteEnergyConsumptionLevel0;
+              }
+
+              //dynamicWriteEnergyConsumptionLevel1
+              if ((rand()%100) >= 50) {
+                blk->dynamicWriteEnergyConsumptionLevel1[t] = dynamicWriteEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel1Var) * dynamicWriteEnergyConsumptionLevel1;
+                
+              } else {
+                blk->dynamicWriteEnergyConsumptionLevel1[t] = dynamicWriteEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel1Var) * dynamicWriteEnergyConsumptionLevel1;
+              }
+
+              //dynamicWriteEnergyConsumptionLevel2
+              if ((rand()%100) >= 50) {
+                blk->dynamicWriteEnergyConsumptionLevel2[t] = dynamicWriteEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel2Var) * dynamicWriteEnergyConsumptionLevel2;
+                
+              } else {
+                blk->dynamicWriteEnergyConsumptionLevel2[t] = dynamicWriteEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel2Var) * dynamicWriteEnergyConsumptionLevel2;
+              }
+
+              //dynamicWriteEnergyConsumptionLevel3
+              if ((rand()%100) >= 50) {
+                blk->dynamicWriteEnergyConsumptionLevel3[t] = dynamicWriteEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel3Var) * dynamicWriteEnergyConsumptionLevel3;
+                
+              } else {
+                blk->dynamicWriteEnergyConsumptionLevel3[t] = dynamicWriteEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel3Var) * dynamicWriteEnergyConsumptionLevel3;
+              }
+            }
+            //AMHM End
         }
     }
 }
@@ -197,3 +576,4 @@ BaseSetAssoc::computeStats()
         }
     }
 }
+//AMHM End

@@ -55,6 +55,9 @@ class BaseCache(MemObject):
 
     hit_latency = Param.Cycles("Hit latency")
     response_latency = Param.Cycles("Latency for the return path on a miss");
+    #AMHM Start
+    write_latency = Param.Cycles("The write latency for this cache")
+    #AMHM End
 
     max_miss_count = Param.Counter(0,
         "Number of misses to handle before calling exit")

@@ -143,6 +143,49 @@ class BaseTags : public ClockedObject
     typedef BaseTagsParams Params;
     BaseTags(const Params *p);
 
+    //AMHM Start
+    //Read error rate per cell
+    double readErrorRateLevel0;
+    double readErrorRateLevel1;
+    double readErrorRateLevel2;
+    double readErrorRateLevel3;
+    //Read error rate per cell var
+    double readErrorRateLevel0Var;
+    double readErrorRateLevel1Var;
+    double readErrorRateLevel2Var;
+    double readErrorRateLevel3Var;
+    //Write erro rate per cell
+    double writeErrorRateLevel0;
+    double writeErrorRateLevel1;
+    double writeErrorRateLevel2;
+    double writeErrorRateLevel3;
+    //Write erro rate per cell var
+    double writeErrorRateLevel0Var;
+    double writeErrorRateLevel1Var;
+    double writeErrorRateLevel2Var;
+    double writeErrorRateLevel3Var;
+    //Energy consumption per line access for read
+    double dynamicReadEnergyConsumptionLevel0;
+    double dynamicReadEnergyConsumptionLevel1;
+    double dynamicReadEnergyConsumptionLevel2;
+    double dynamicReadEnergyConsumptionLevel3;
+    //Energy consumption per line access for read var
+    double dynamicReadEnergyConsumptionLevel0Var;
+    double dynamicReadEnergyConsumptionLevel1Var;
+    double dynamicReadEnergyConsumptionLevel2Var;
+    double dynamicReadEnergyConsumptionLevel3Var;
+    //Energy consumption per line access for write
+    double dynamicWriteEnergyConsumptionLevel0;
+    double dynamicWriteEnergyConsumptionLevel1;
+    double dynamicWriteEnergyConsumptionLevel2;
+    double dynamicWriteEnergyConsumptionLevel3;
+    //Energy consumption per line access for write var
+    double dynamicWriteEnergyConsumptionLevel0Var;
+    double dynamicWriteEnergyConsumptionLevel1Var;
+    double dynamicWriteEnergyConsumptionLevel2Var;
+    double dynamicWriteEnergyConsumptionLevel3Var;
+    //AMHM End
+
     /**
      * Destructor.
      */

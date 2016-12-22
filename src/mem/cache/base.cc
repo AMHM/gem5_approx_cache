@@ -73,6 +73,9 @@ BaseCache::BaseCache(const BaseCacheParams *p, unsigned blk_size)
       writeBuffer("write buffer", p->write_buffers, p->mshrs), // see below
       blkSize(blk_size),
       lookupLatency(p->hit_latency),
+      //AMHM Start
+      writeLatency(p->write_latency),
+      //AMHM End
       forwardLatency(p->hit_latency),
       fillLatency(p->response_latency),
       responseLatency(p->response_latency),
@@ -179,6 +182,29 @@ BaseCache::regStats()
     MemObject::regStats();
 
     using namespace Stats;
+
+    //AMHM Start
+    totalNumberOfReads
+        .name(name() + ".totalNumberOfReads")
+        .desc("AMHM: Total Number of Physical Read Operations in STT-RAM Cache Lines")
+        ;
+    totalNumberOfWrites
+        .name(name() + ".totalNumberOfWrites")
+        .desc("AMHM: Total Number of Physical Write Operations in STT-RAM Cache Lines")
+        ;
+    totlaDynamicEnergyConsumption
+        .name(name() + ".totlaDynamicEnergyConsumption")
+        .desc("AMHM: Total dynamic energy consumption of this cache")
+        ;
+    totalNumberOfWriteErrorFaultInjection
+        .name(name() + ".totalNumberOfWriteErrorFaultInjection")
+        .desc("AMHM: Total number of write failure injected faults")
+        ;
+    totalNumberOfReadDisturbedBits
+        .name(name() + ".totalNumberOfReadDisturbedBits")
+        .desc("AMHM: Total number of read disturbance injected faults")
+        ;
+    //AMHM End
 
     // Hit statistics
     for (int access_idx = 0; access_idx < MemCmd::NUM_MEM_CMDS; ++access_idx) {

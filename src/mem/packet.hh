@@ -357,6 +357,10 @@ class Packet : public Printable
      */
     uint32_t payloadDelay;
 
+    //AMHM Start
+	uint32_t reliabilityLevel;
+	//AMHM End
+
     /**
      * A virtual base opaque structure used to hold state associated
      * with the packet (e.g., an MSHR), specific to a MemObject that
@@ -698,9 +702,10 @@ class Packet : public Printable
      * first, but the Requests's physical address and size fields need
      * not be valid. The command must be supplied.
      */
+    //AMHM Start
     Packet(const RequestPtr _req, MemCmd _cmd)
         :  cmd(_cmd), req(_req), data(nullptr), addr(0), _isSecure(false),
-           size(0), headerDelay(0), snoopDelay(0), payloadDelay(0),
+           size(0), headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0),
            senderState(NULL)
     {
         if (req->hasPaddr()) {
@@ -721,7 +726,7 @@ class Packet : public Printable
      */
     Packet(const RequestPtr _req, MemCmd _cmd, int _blkSize)
         :  cmd(_cmd), req(_req), data(nullptr), addr(0), _isSecure(false),
-           headerDelay(0), snoopDelay(0), payloadDelay(0),
+           headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0),
            senderState(NULL)
     {
         if (req->hasPaddr()) {
@@ -748,6 +753,7 @@ class Packet : public Printable
            headerDelay(pkt->headerDelay),
            snoopDelay(0),
            payloadDelay(pkt->payloadDelay),
+		   reliabilityLevel(0),
            senderState(pkt->senderState)
     {
         if (!clear_flags)
@@ -771,6 +777,7 @@ class Packet : public Printable
             }
         }
     }
+    //AMHM End
 
     /**
      * Generate the appropriate read MemCmd based on the Request flags.

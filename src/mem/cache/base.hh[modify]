@@ -98,7 +98,7 @@ class BaseCache : public MemObject
         NUM_BLOCKED_CAUSES
     };
 
-  public:
+  protected:
 
     /**
      * A cache master port is used for the memory-side port of the
@@ -160,10 +160,6 @@ class BaseCache : public MemObject
         void clearBlocked();
 
         bool isBlocked() const { return blocked; }
-
-        MemObject* getOwner() {
-            return &owner;
-        }
 
       protected:
 
@@ -273,6 +269,7 @@ class BaseCache : public MemObject
      */
     const Cycles writeLatency;
     //AMHM End
+    
 
     /**
      * This is the forward latency of the cache. It occurs when there

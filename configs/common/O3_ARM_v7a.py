@@ -149,6 +149,7 @@ class O3_ARM_v7a_3(DerivO3CPU):
 class O3_ARM_v7a_ICache(Cache):
     hit_latency = 1
     response_latency = 1
+    write_latency = 1
     mshrs = 2
     tgts_per_mshr = 8
     size = '32kB'
@@ -161,6 +162,7 @@ class O3_ARM_v7a_ICache(Cache):
 class O3_ARM_v7a_DCache(Cache):
     hit_latency = 2
     response_latency = 2
+    write_latency = 2
     mshrs = 6
     tgts_per_mshr = 8
     size = '32kB'
@@ -187,6 +189,8 @@ class O3_ARM_v7aWalkCache(Cache):
 class O3_ARM_v7aL2(Cache):
     hit_latency = 12
     response_latency = 12
+    write_latency = 20
+    write-la
     mshrs = 16
     tgts_per_mshr = 8
     size = '1MB'

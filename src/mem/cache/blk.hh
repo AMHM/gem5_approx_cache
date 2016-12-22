@@ -123,6 +123,30 @@ class CacheBlk
 
     Tick tickInserted;
 
+    //AMHM Start
+    //Read error rate per cell
+    double readErrorRateLevel0[512];
+    double readErrorRateLevel1[512];
+    double readErrorRateLevel2[512];
+    double readErrorRateLevel3[512];
+    //Write erro rate per cell
+    double writeErrorRateLevel0[512];
+    double writeErrorRateLevel1[512];
+    double writeErrorRateLevel2[512];
+    double writeErrorRateLevel3[512];
+    //Energy consumption per line access for read
+    double dynamicReadEnergyConsumptionLevel0[512];
+    double dynamicReadEnergyConsumptionLevel1[512];
+    double dynamicReadEnergyConsumptionLevel2[512];
+    double dynamicReadEnergyConsumptionLevel3[512];
+    //Energy consumption per line access for write
+    double dynamicWriteEnergyConsumptionLevel0[512];
+    double dynamicWriteEnergyConsumptionLevel1[512];
+    double dynamicWriteEnergyConsumptionLevel2[512];
+    double dynamicWriteEnergyConsumptionLevel3[512];
+    int randSeed; //Each block has a special seed number to generate identical sequence of random number for PV
+    //AMHM End
+
   protected:
     /**
      * Represents that the indicated thread context has a "lock" on
