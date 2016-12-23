@@ -1,4 +1,4 @@
-BUILD_CORES=8
+BUILD_CORES=32
 
 all: 
 		#scons -j $(BUILD_CORES) --ignore-style build/ARM/gem5.debug

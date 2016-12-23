@@ -171,6 +171,8 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
     old_data[i] = 0;
     setBit[i] = 0;
   }
+  if((pkt->reliabilityLevel == 1) && (name()=="system.l2"))
+        		printf("Man Injam 2.\n");
 
   //If the packet is not read and is not write, we should not consider it!
   if ((!pkt->isRead()) && (!pkt->isWrite()))
@@ -213,7 +215,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                           } 
-                          if((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))
+                         if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (name() == "system.l2"))
                             if(((double) (rand() % RAND_MAX) / RAND_MAX) < writeErrorRate) {
                                 new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                                 totalNumberOfWriteErrorFaultInjection++;
@@ -253,7 +255,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                     }  
-                    if((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))
+                    if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (name() == "system.l2"))
                       if ((setBit[i] & 0x01) == 1){
                           if(((double) (rand() % RAND_MAX) / RAND_MAX) < readErrorRate) {
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
@@ -761,6 +763,14 @@ Cache::doWritebacksAtomic(PacketList& writebacks)
                 // below. We can discard CleanEvicts because cached
                 // copies exist above. Atomic mode isCachedAbove
                 // modifies packet to set BLOCK_CACHED flag
+            	//AMHM Start
+				//Setting the reliability level of the arrived packet
+				if((wbPkt->req->hasVaddr()) && (myPageTable != nullptr)){
+					wbPkt->reliabilityLevel = approxTable.appTableCheck(wbPkt->req->getVaddr());
+					if(wbPkt->reliabilityLevel == 1)
+						printf("Man Injam 7.\n");
+				}
+				//AMHM End
                 memSidePort->sendAtomic(wbPkt);
             }
         } else {
@@ -768,6 +778,14 @@ Cache::doWritebacksAtomic(PacketList& writebacks)
             // CleanEvict and Writeback with BLOCK_CACHED flag cleared will
             // reset the bit corresponding to this address in the snoop filter
             // below.
+        	//AMHM Start
+			//Setting the reliability level of the arrived packet
+			if((wbPkt->req->hasVaddr()) && (myPageTable != nullptr)){
+				wbPkt->reliabilityLevel = approxTable.appTableCheck(wbPkt->req->getVaddr());
+				if(wbPkt->reliabilityLevel == 1)
+					printf("Man Injam 8.\n");
+			}
+			//AMHM End
             memSidePort->sendAtomic(wbPkt);
         }
         writebacks.pop_front();
@@ -835,16 +853,17 @@ Cache::recvTimingReq(PacketPtr pkt)
 
     assert(pkt->isRequest());
 
-    //AMHM Start
-    //Setting the reliability level of the arrived packet
-    if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-    	pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-    }
-    //AMHM End
-
     // Just forward the packet if caches are disabled.
     if (system->bypassCaches()) {
         // @todo This should really enqueue the packet rather
+    	//AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+			if(pkt->reliabilityLevel == 1)
+				printf("Man Injam 3.\n");
+		}
+		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(pkt);
         assert(success);
         return true;
@@ -899,6 +918,14 @@ Cache::recvTimingReq(PacketPtr pkt)
         // this express snoop travels towards the memory, and at
         // every crossbar it is snooped upwards thus reaching
         // every cache in the system
+        //AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((snoop_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			snoop_pkt->reliabilityLevel = approxTable.appTableCheck(snoop_pkt->req->getVaddr());
+			if(snoop_pkt->reliabilityLevel == 1)
+				printf("Man Injam 4.\n");
+		}
+		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(snoop_pkt);
         // express snoops always succeed
         assert(success);
@@ -1236,16 +1263,18 @@ Cache::recvAtomic(PacketPtr pkt)
     // We are in atomic mode so we pay just for lookupLatency here.
     Cycles lat = lookupLatency;
 
-    //AMHM Start
-	//Setting the reliability level of the arrived packet
-	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-	}
-	//AMHM End
-
     // Forward the request if the system is in cache bypass mode.
-    if (system->bypassCaches())
+    if (system->bypassCaches()){
+    	//AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+			if(pkt->reliabilityLevel == 1)
+				printf("Man Injam 8.\n");
+		}
+		//AMHM End
         return ticksToCycles(memSidePort->sendAtomic(pkt));
+    }
 
     promoteWholeLineWrites(pkt);
 
@@ -1259,6 +1288,14 @@ Cache::recvAtomic(PacketPtr pkt)
         // if a cache is responding, and it had the line in Owned
         // rather than Modified state, we need to invalidate any
         // copies that are not on the same path to memory
+        //AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+			if(pkt->reliabilityLevel == 1)
+				printf("Man Injam 9.\n");
+		}
+		//AMHM End
         assert(pkt->needsWritable() && !pkt->responderHadWritable());
         lat += ticksToCycles(memSidePort->sendAtomic(pkt));
 
@@ -1284,6 +1321,14 @@ Cache::recvAtomic(PacketPtr pkt)
         // the cache, i.e. any evictions and uncacheable writes
         if (pkt->isEviction() ||
             (pkt->req->isUncacheable() && pkt->isWrite())) {
+        	//AMHM Start
+			//Setting the reliability level of the arrived packet
+			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+				if(pkt->reliabilityLevel == 1)
+					printf("Man Injam 10.\n");
+			}
+			//AMHM End
             lat += ticksToCycles(memSidePort->sendAtomic(pkt));
             return lat * clockPeriod();
         }
@@ -1306,7 +1351,14 @@ Cache::recvAtomic(PacketPtr pkt)
 #if TRACING_ON
         CacheBlk::State old_state = blk ? blk->status : 0;
 #endif
-
+        //AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((bus_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			bus_pkt->reliabilityLevel = approxTable.appTableCheck(bus_pkt->req->getVaddr());
+			if(bus_pkt->reliabilityLevel == 1)
+				printf("Man Injam 12.\n");
+		}
+		//AMHM End
         lat += ticksToCycles(memSidePort->sendAtomic(bus_pkt));
 
         bool is_invalidate = bus_pkt->isInvalidate();
@@ -1416,6 +1468,14 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
 
         // The cache should be flushed if we are in cache bypass mode,
         // so we don't need to check if we need to update anything.
+        //AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+			if(pkt->reliabilityLevel == 1)
+				printf("Man Injam 13.\n");
+		}
+		//AMHM End
         memSidePort->sendFunctional(pkt);
         return;
     }
@@ -1465,6 +1525,14 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
         // if it came as a request from the CPU side then make sure it
         // continues towards the memory side
         if (fromCpuSide) {
+        	//AMHM Start
+			//Setting the reliability level of the arrived packet
+			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+				if(pkt->reliabilityLevel == 1)
+					printf("Man Injam 14.\n");
+			}
+			//AMHM End
             memSidePort->sendFunctional(pkt);
         } else if (cpuSidePort->isSnooping()) {
             // if it came from the memory side, it must be a snoop request
@@ -1824,11 +1892,17 @@ Cache::writebackBlk(CacheBlk *blk)
     if(myPageTable != nullptr){
     	//At first we should lookup the page table to retrieve the virtual address from physical address
     	Addr p_page_addr;
+    	Addr searchAddress = 0;
     	for(int i = 0; i < approxTable.lastentryIndex; i++) {
-    		if(myPageTable->translate(approxTable.appTable[i].start, p_page_addr)){
-    			if(p_page_addr == pkt->getAddr()){
-    				pkt->reliabilityLevel = approxTable.appTable[i].reliabilityLevel;
-    			}
+    		searchAddress = approxTable.appTable[i].start;
+    		while(searchAddress < (approxTable.appTable[i].end - blkSize)){
+				if(myPageTable->translate(searchAddress, p_page_addr)){
+					if(p_page_addr == pkt->getAddr()){
+						printf("Man Injam 1.\n");
+						pkt->reliabilityLevel = approxTable.appTable[i].reliabilityLevel;
+					}
+				}
+				searchAddress += blkSize;
     		}
     	}
     }
@@ -1912,6 +1986,15 @@ Cache::writebackVisitor(CacheBlk &blk)
 
         Packet packet(&request, MemCmd::WriteReq);
         packet.dataStatic(blk.data);
+
+        //AMHM Start
+		//Setting the reliability level of the arrived packet
+		if((packet.req->hasVaddr()) && (myPageTable != nullptr)){
+			packet.reliabilityLevel = approxTable.appTableCheck(packet.req->getVaddr());
+			if(packet.reliabilityLevel == 1)
+				printf("Man Injam 15.\n");
+		}
+		//AMHM End
 
         memSidePort->sendFunctional(&packet);
 
@@ -2370,13 +2453,6 @@ Cache::recvTimingSnoopReq(PacketPtr pkt)
     DPRINTF(CacheVerbose, "%s for %s addr %#llx size %d\n", __func__,
             pkt->cmdString(), pkt->getAddr(), pkt->getSize());
 
-    //AMHM Start
-	//Setting the reliability level of the arrived packet
-	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-	}
-	//AMHM End
-
     // Snoops shouldn't happen when bypassing caches
     assert(!system->bypassCaches());
 
@@ -2507,13 +2583,6 @@ Cache::recvAtomicSnoop(PacketPtr pkt)
 {
     // Snoops shouldn't happen when bypassing caches
     assert(!system->bypassCaches());
-
-    //AMHM Start
-	//Setting the reliability level of the arrived packet
-	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-	}
-	//AMHM End
 
     // no need to snoop requests that are not in range.
     if (!inRange(pkt->getAddr())) {
@@ -2745,7 +2814,14 @@ Cache::sendMSHRQueuePacket(MSHR* mshr)
     // play it safe and append (rather than set) the sender state,
     // as forwarded packets may already have existing state
     pkt->pushSenderState(mshr);
-
+    //AMHM Start
+	//Setting the reliability level of the arrived packet
+	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+		if(pkt->reliabilityLevel == 1)
+			printf("Man Injam 5.\n");
+	}
+	//AMHM End
     if (!memSidePort->sendTimingReq(pkt)) {
         // we are awaiting a retry, but we
         // delete the packet and will be creating a new packet
@@ -2786,6 +2862,14 @@ Cache::sendWriteQueuePacket(WriteQueueEntry* wq_entry)
             tgt_pkt->getSize());
 
     // forward as is, both for evictions and uncacheable writes
+    //AMHM Start
+	//Setting the reliability level of the arrived packet
+	if((tgt_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+		tgt_pkt->reliabilityLevel = approxTable.appTableCheck(tgt_pkt->req->getVaddr());
+		if(tgt_pkt->reliabilityLevel == 1)
+			printf("Man Injam 6.\n");
+	}
+	//AMHM End
     if (!memSidePort->sendTimingReq(tgt_pkt)) {
         // note that we have now masked any requestBus and
         // schedSendEvent (we will wait for a retry before
