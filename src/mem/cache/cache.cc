@@ -66,6 +66,7 @@
 
  //A.M.H.M Start
 #include <math.h>
+#include <time.h>
 //A.M.H.M End
 
 Cache::Cache(const CacheParams *p)
@@ -93,6 +94,8 @@ Cache::Cache(const CacheParams *p)
     if (prefetcher)
         prefetcher->setCache(this);
     //AMHM Start
+    new_data = new uint8_t[blkSize];
+    old_data = new uint8_t[blkSize];
     alreadyCalculatedStatsOperation = 0;
     //AMHM End
 }
@@ -164,15 +167,13 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   double dynamicReadEnergy = 0;
   double dynamicWriteEnergy = 0;
   //Setting the srand() to obtain same result for different run
-  //srand(blk->randSeed); //each block has its own seed number!
+  srand(time(NULL));
   //initialization
   for (int i = 0; i < blkSize; i++){
     new_data[i] = 0;
     old_data[i] = 0;
     setBit[i] = 0;
   }
-  if((pkt->reliabilityLevel == 1) && (name()=="system.l2"))
-        		printf("Man Injam 2.\n");
 
   //If the packet is not read and is not write, we should not consider it!
   if ((!pkt->isRead()) && (!pkt->isWrite()))
@@ -223,7 +224,20 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                           totlaDynamicEnergyConsumption += dynamicWriteEnergy;
 
                 }
-        totalNumberOfWrites++;
+            switch (pkt->reliabilityLevel) {
+            	case 0 : totalNumberOfWrites++;
+            			 break;
+            	case 1 : totalNumberOfWriteR1++;
+            			 totalNumberOfWrites++;
+            	         break;
+            	case 2 : totalNumberOfWriteR2++;
+						 totalNumberOfWrites++;
+						 break;
+            	case 3 : totalNumberOfWriteR3++;
+						 totalNumberOfWrites++;
+						 break;
+            	default : break;
+            }
     }
     else {//read
             for (int i = 0; i < blkSize; i++)
@@ -264,8 +278,21 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                       }
                     setBit[i] >>= 1; // shift bits, removing lower bit
                     totlaDynamicEnergyConsumption += dynamicReadEnergy;
-                }            
-            totalNumberOfReads++;
+                }
+            switch (pkt->reliabilityLevel) {
+				case 0 : totalNumberOfReads++;
+						 break;
+				case 1 : totalNumberOfReadR1++;
+						 totalNumberOfReads++;
+						 break;
+				case 2 : totalNumberOfReadR2++;
+						 totalNumberOfReads++;
+						 break;
+				case 3 : totalNumberOfReadR3++;
+						 totalNumberOfReads++;
+						 break;
+				default : break;
+			}
     }
     //applying the faults
     if(name() == "system.l2"){
@@ -368,9 +395,8 @@ Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
             temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1);
             if (temp == 0) // No fault injection!
               pkt->writeDataToBlock(blk->data, blkSize);
-            else { // Fault injection to ensure the effective fault injection, we also write the faulty data in this packet!
+            else { // Fault injection
               std::memcpy(blk->data, new_data, blkSize);
-              pkt->setDataFromBlock(new_data, blkSize);
             }
             //AMHM End
         }
@@ -652,7 +678,6 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
         }
         else {
           std::memcpy(blk->data, new_data, blkSize);
-          pkt->setDataFromBlock(new_data, blkSize);
         }
         //AMHM End
         DPRINTF(Cache, "%s new state is %s\n", __func__, blk->print());
@@ -767,8 +792,6 @@ Cache::doWritebacksAtomic(PacketList& writebacks)
 				//Setting the reliability level of the arrived packet
 				if((wbPkt->req->hasVaddr()) && (myPageTable != nullptr)){
 					wbPkt->reliabilityLevel = approxTable.appTableCheck(wbPkt->req->getVaddr());
-					if(wbPkt->reliabilityLevel == 1)
-						printf("Man Injam 7.\n");
 				}
 				//AMHM End
                 memSidePort->sendAtomic(wbPkt);
@@ -782,8 +805,6 @@ Cache::doWritebacksAtomic(PacketList& writebacks)
 			//Setting the reliability level of the arrived packet
 			if((wbPkt->req->hasVaddr()) && (myPageTable != nullptr)){
 				wbPkt->reliabilityLevel = approxTable.appTableCheck(wbPkt->req->getVaddr());
-				if(wbPkt->reliabilityLevel == 1)
-					printf("Man Injam 8.\n");
 			}
 			//AMHM End
             memSidePort->sendAtomic(wbPkt);
@@ -860,8 +881,6 @@ Cache::recvTimingReq(PacketPtr pkt)
 		//Setting the reliability level of the arrived packet
 		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-			if(pkt->reliabilityLevel == 1)
-				printf("Man Injam 3.\n");
 		}
 		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(pkt);
@@ -922,8 +941,6 @@ Cache::recvTimingReq(PacketPtr pkt)
 		//Setting the reliability level of the arrived packet
 		if((snoop_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			snoop_pkt->reliabilityLevel = approxTable.appTableCheck(snoop_pkt->req->getVaddr());
-			if(snoop_pkt->reliabilityLevel == 1)
-				printf("Man Injam 4.\n");
 		}
 		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(snoop_pkt);
@@ -1269,8 +1286,6 @@ Cache::recvAtomic(PacketPtr pkt)
 		//Setting the reliability level of the arrived packet
 		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-			if(pkt->reliabilityLevel == 1)
-				printf("Man Injam 8.\n");
 		}
 		//AMHM End
         return ticksToCycles(memSidePort->sendAtomic(pkt));
@@ -1292,8 +1307,6 @@ Cache::recvAtomic(PacketPtr pkt)
 		//Setting the reliability level of the arrived packet
 		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-			if(pkt->reliabilityLevel == 1)
-				printf("Man Injam 9.\n");
 		}
 		//AMHM End
         assert(pkt->needsWritable() && !pkt->responderHadWritable());
@@ -1325,8 +1338,6 @@ Cache::recvAtomic(PacketPtr pkt)
 			//Setting the reliability level of the arrived packet
 			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-				if(pkt->reliabilityLevel == 1)
-					printf("Man Injam 10.\n");
 			}
 			//AMHM End
             lat += ticksToCycles(memSidePort->sendAtomic(pkt));
@@ -1355,8 +1366,6 @@ Cache::recvAtomic(PacketPtr pkt)
 		//Setting the reliability level of the arrived packet
 		if((bus_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			bus_pkt->reliabilityLevel = approxTable.appTableCheck(bus_pkt->req->getVaddr());
-			if(bus_pkt->reliabilityLevel == 1)
-				printf("Man Injam 12.\n");
 		}
 		//AMHM End
         lat += ticksToCycles(memSidePort->sendAtomic(bus_pkt));
@@ -1472,8 +1481,6 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
 		//Setting the reliability level of the arrived packet
 		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-			if(pkt->reliabilityLevel == 1)
-				printf("Man Injam 13.\n");
 		}
 		//AMHM End
         memSidePort->sendFunctional(pkt);
@@ -1529,8 +1536,6 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
 			//Setting the reliability level of the arrived packet
 			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-				if(pkt->reliabilityLevel == 1)
-					printf("Man Injam 14.\n");
 			}
 			//AMHM End
             memSidePort->sendFunctional(pkt);
@@ -1898,7 +1903,6 @@ Cache::writebackBlk(CacheBlk *blk)
     		while(searchAddress < (approxTable.appTable[i].end - blkSize)){
 				if(myPageTable->translate(searchAddress, p_page_addr)){
 					if(p_page_addr == pkt->getAddr()){
-						printf("Man Injam 1.\n");
 						pkt->reliabilityLevel = approxTable.appTable[i].reliabilityLevel;
 					}
 				}
@@ -1991,8 +1995,6 @@ Cache::writebackVisitor(CacheBlk &blk)
 		//Setting the reliability level of the arrived packet
 		if((packet.req->hasVaddr()) && (myPageTable != nullptr)){
 			packet.reliabilityLevel = approxTable.appTableCheck(packet.req->getVaddr());
-			if(packet.reliabilityLevel == 1)
-				printf("Man Injam 15.\n");
 		}
 		//AMHM End
 
@@ -2818,8 +2820,6 @@ Cache::sendMSHRQueuePacket(MSHR* mshr)
 	//Setting the reliability level of the arrived packet
 	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-		if(pkt->reliabilityLevel == 1)
-			printf("Man Injam 5.\n");
 	}
 	//AMHM End
     if (!memSidePort->sendTimingReq(pkt)) {
@@ -2866,8 +2866,6 @@ Cache::sendWriteQueuePacket(WriteQueueEntry* wq_entry)
 	//Setting the reliability level of the arrived packet
 	if((tgt_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
 		tgt_pkt->reliabilityLevel = approxTable.appTableCheck(tgt_pkt->req->getVaddr());
-		if(tgt_pkt->reliabilityLevel == 1)
-			printf("Man Injam 6.\n");
 	}
 	//AMHM End
     if (!memSidePort->sendTimingReq(tgt_pkt)) {

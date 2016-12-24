@@ -194,7 +194,7 @@ BaseCache::regStats()
         ;
     totlaDynamicEnergyConsumption
         .name(name() + ".totlaDynamicEnergyConsumption")
-        .desc("AMHM: Total dynamic energy consumption of this cache")
+        .desc("AMHM: Total dynamic energy consumption of this cache (pJ)")
         ;
     totalNumberOfWriteErrorFaultInjection
         .name(name() + ".totalNumberOfWriteErrorFaultInjection")
@@ -204,6 +204,30 @@ BaseCache::regStats()
         .name(name() + ".totalNumberOfReadDisturbedBits")
         .desc("AMHM: Total number of read disturbance injected faults")
         ;
+    totalNumberOfReadR1
+		.name(name() + ".totalNumberOfReadR1")
+		.desc("AMHM: Total number of reads in reliability level 1 mode in cache")
+		;
+    totalNumberOfReadR2
+		.name(name() + ".totalNumberOfReadR2")
+		.desc("AMHM: Total number of reads in reliability level 2 mode in cache")
+		;
+    totalNumberOfReadR3
+		.name(name() + ".totalNumberOfReadR3")
+		.desc("AMHM: Total number of reads in reliability level 3 mode in cache")
+		;
+    totalNumberOfWriteR1
+		.name(name() + ".totalNumberOfWriteR1")
+		.desc("AMHM: Total number of writes in reliability level 1 mode in cache")
+		;
+    totalNumberOfWriteR2
+		.name(name() + ".totalNumberOfWriteR2")
+		.desc("AMHM: Total number of writes in reliability level 2 mode in cache")
+		;
+    totalNumberOfWriteR3
+    		.name(name() + ".totalNumberOfWriteR3")
+    		.desc("AMHM: Total number of writes in reliability level 3 mode in cache")
+    		;
     //AMHM End
 
     // Hit statistics

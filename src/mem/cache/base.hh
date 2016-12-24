@@ -343,6 +343,18 @@ class BaseCache : public MemObject
     Stats::Scalar totalNumberOfWriteErrorFaultInjection;
     //Total number of read disturbance injected faults
     Stats::Scalar totalNumberOfReadDisturbedBits;
+    //Total number of reads in reliability level 1 mode in cache
+    Stats::Scalar totalNumberOfReadR1;
+    //Total number of reads in reliability level 2 mode in cache
+    Stats::Scalar totalNumberOfReadR2;
+    //Total number of reads in reliability level 3 mode in cache
+    Stats::Scalar totalNumberOfReadR3;
+    //Total number of writes in reliability level 1 mode in cache
+	Stats::Scalar totalNumberOfWriteR1;
+	//Total number of writes in reliability level 2 mode in cache
+	Stats::Scalar totalNumberOfWriteR2;
+	//Total number of writes in reliability level 3 mode in cache
+	Stats::Scalar totalNumberOfWriteR3;
     //AMHM End
 
     // Statistics

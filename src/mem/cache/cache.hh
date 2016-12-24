@@ -209,8 +209,8 @@ class Cache : public BaseCache
     //AMHM Start
     bool STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bool readWrite); //read:0 write:1 
     bool alreadyCalculatedStatsOperation;
-    uint8_t new_data[64];
-    uint8_t old_data[64];
+    uint8_t * new_data;
+    uint8_t * old_data;
     //AMHM End
     
     FuncPageTable *myPageTable;
