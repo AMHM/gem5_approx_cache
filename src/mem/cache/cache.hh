@@ -61,6 +61,9 @@
 #include "mem/page_table.hh"
 #include "params/Cache.hh"
 #include "sim/eventq.hh"
+//AMHM Start
+#include<list>
+//AMHM End
 
 //Forward decleration
 class BasePrefetcher;
@@ -74,18 +77,18 @@ class Cache : public BaseCache
 {
 	//AMHM Start
   public:
+	struct Table {
+				Addr start;
+				Addr end;
+				uint32_t reliabilityLevel;
+			};
 	class Approximation {
 	public:
 		Approximation();
 		void appTableInsert(Addr start, Addr end, uint32_t reliabilityLevel);
 		void appTableRemove(Addr start, Addr end, uint32_t reliabilityLevel);
 		uint32_t appTableCheck(Addr address);
-		struct Table {
-			Addr start;
-			Addr end;
-			uint32_t reliabilityLevel;
-		} appTable[1000];
-		int lastentryIndex;
+		std::list <Table> appTable;
 	};
 	Approximation approxTable;
 	//AMHM End

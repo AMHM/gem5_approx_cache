@@ -164,26 +164,28 @@ class BaseTags : public ClockedObject
     double writeErrorRateLevel1Var;
     double writeErrorRateLevel2Var;
     double writeErrorRateLevel3Var;
-    //Energy consumption per line access for read
+    //Energy consumption per cell access for read
     double dynamicReadEnergyConsumptionLevel0;
     double dynamicReadEnergyConsumptionLevel1;
     double dynamicReadEnergyConsumptionLevel2;
     double dynamicReadEnergyConsumptionLevel3;
-    //Energy consumption per line access for read var
+    //Energy consumption per cell access for read var
     double dynamicReadEnergyConsumptionLevel0Var;
     double dynamicReadEnergyConsumptionLevel1Var;
     double dynamicReadEnergyConsumptionLevel2Var;
     double dynamicReadEnergyConsumptionLevel3Var;
-    //Energy consumption per line access for write
+    //Energy consumption per cell access for write
     double dynamicWriteEnergyConsumptionLevel0;
     double dynamicWriteEnergyConsumptionLevel1;
     double dynamicWriteEnergyConsumptionLevel2;
     double dynamicWriteEnergyConsumptionLevel3;
-    //Energy consumption per line access for write var
+    //Energy consumption per cell access for write var
     double dynamicWriteEnergyConsumptionLevel0Var;
     double dynamicWriteEnergyConsumptionLevel1Var;
     double dynamicWriteEnergyConsumptionLevel2Var;
     double dynamicWriteEnergyConsumptionLevel3Var;
+    //Fault injection flag: 0: Disable 1: Enable
+    bool faultInjection;
     //AMHM End
 
     /**

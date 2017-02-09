@@ -81,6 +81,8 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     //AMHM Start
     FILE * STTRAMCellConfig;
     STTRAMCellConfig = fopen (".//configs//common//STT-RAMCacheConfig.cfg", "r");
+    FILE * STTRAMFIConfig;
+    STTRAMFIConfig = fopen (".//configs//common//STTRAMFIConfig.cfg", "r");
     char stringTemp0[500];
     char stringTemp1[500];
     double value1 = 0;
@@ -93,224 +95,303 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
             while(STTRAMCellConfig) {
                 if(fscanf(STTRAMCellConfig, "%s %le %le %s", stringTemp0, &value1, &value2, stringTemp1) == 4) {
                     if(!strcmp(stringTemp0, "L1IreadErrorRateLevel0")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if(((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags"))||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             readErrorRateLevel0 = value1;
                             readErrorRateLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel0")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if(((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags"))||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             readErrorRateLevel0 = value1;
                             readErrorRateLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2readErrorRateLevel0")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             readErrorRateLevel0 = value1;
                             readErrorRateLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel0")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             writeErrorRateLevel0 = value1;
                             writeErrorRateLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel0")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             writeErrorRateLevel0 = value1;
                             writeErrorRateLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel0")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             writeErrorRateLevel0 = value1;
                             writeErrorRateLevel0Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel1")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             readErrorRateLevel1 = value1;
                             readErrorRateLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel1")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             readErrorRateLevel1 = value1;
                             readErrorRateLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2readErrorRateLevel1")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             readErrorRateLevel1 = value1;
                             readErrorRateLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel1")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             writeErrorRateLevel1 = value1;
                             writeErrorRateLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel1")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             writeErrorRateLevel1 = value1;
                             writeErrorRateLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel1")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             writeErrorRateLevel1 = value1;
                             writeErrorRateLevel1Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel2")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             readErrorRateLevel2 = value1;
                             readErrorRateLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel2")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             readErrorRateLevel2 = value1;
                             readErrorRateLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2readErrorRateLevel2")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             readErrorRateLevel2 = value1;
                             readErrorRateLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel2")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             writeErrorRateLevel2 = value1;
                             writeErrorRateLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel2")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             writeErrorRateLevel2 = value1;
                             writeErrorRateLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel2")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             writeErrorRateLevel2 = value1;
                             writeErrorRateLevel2Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "L1IreadErrorRateLevel3")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             readErrorRateLevel3 = value1;
                             readErrorRateLevel3Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DreadErrorRateLevel3")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             readErrorRateLevel3 = value1;
                             readErrorRateLevel3Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2readErrorRateLevel3")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             readErrorRateLevel3 = value1;
                             readErrorRateLevel3Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1IwriteErrorRateLevel3")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             writeErrorRateLevel3 = value1;
                             writeErrorRateLevel3Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L1DwriteErrorRateLevel3")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             writeErrorRateLevel3 = value1;
                             writeErrorRateLevel3Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "L2writeErrorRateLevel3")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             writeErrorRateLevel3 = value1;
                             writeErrorRateLevel3Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel0")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicReadEnergyConsumptionLevel0 = value1;
                             dynamicReadEnergyConsumptionLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel0")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicReadEnergyConsumptionLevel0 = value1;
                             dynamicReadEnergyConsumptionLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel0")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicReadEnergyConsumptionLevel0 = value1;
                             dynamicReadEnergyConsumptionLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel0")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicWriteEnergyConsumptionLevel0 = value1;
                             dynamicWriteEnergyConsumptionLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel0")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicWriteEnergyConsumptionLevel0 = value1;
                             dynamicWriteEnergyConsumptionLevel0Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel0")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicWriteEnergyConsumptionLevel0 = value1;
                             dynamicWriteEnergyConsumptionLevel0Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel1")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicReadEnergyConsumptionLevel1 = value1;
                             dynamicReadEnergyConsumptionLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel1")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicReadEnergyConsumptionLevel1 = value1;
                             dynamicReadEnergyConsumptionLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel1")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicReadEnergyConsumptionLevel1 = value1;
                             dynamicReadEnergyConsumptionLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel1")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicWriteEnergyConsumptionLevel1 = value1;
                             dynamicWriteEnergyConsumptionLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel1")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicWriteEnergyConsumptionLevel1 = value1;
                             dynamicWriteEnergyConsumptionLevel1Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel1")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicWriteEnergyConsumptionLevel1 = value1;
                             dynamicWriteEnergyConsumptionLevel1Var = value2;
+                        }
                     }
 
                     else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel2")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel2")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel2")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel2")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel2")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel2")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
                     }
 
-                    else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel3")) {
-                        if(name() == "system.cpu.icache.tags")
+                    } else if(!strcmp(stringTemp0, "dynamicL1IReadEnergyConsumptionLevel3")) {
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DReadEnergyConsumptionLevel3")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2ReadEnergyConsumptionLevel3")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicReadEnergyConsumptionLevel2 = value1;
                             dynamicReadEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1IWriteEnergyConsumptionLevel3")) {
-                        if(name() == "system.cpu.icache.tags")
+                        if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags")){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL1DWriteEnergyConsumptionLevel3")) {
-                        if(name() == "system.cpu.dcache.tags")
+                        if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags")){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
+                        }
                     } else if(!strcmp(stringTemp0, "dynamicL2WriteEnergyConsumptionLevel3")) {
-                        if(name() == "system.l2.tags")
+                        if(name() == "system.l2.tags"){
                             dynamicWriteEnergyConsumptionLevel2 = value1;
                             dynamicWriteEnergyConsumptionLevel2Var = value2;
+                        }
                     }
-                    else {
-                            printf("Errors in reading STT-RAM cache config file!\n");
-                            break;
-                    }
-                }
-                else
-                    break;
+					else {
+							printf("Errors in reading STT-RAM cache config file!(1)\n");
+							break;
+						}
+				} else
+					break;
             }
-            fclose(STTRAMCellConfig);
-        } 
-        else
-            printf("Errors in reading STT-RAM cache config file!\n");
+        }else
+        	printf("Errors in reading STT-RAM cache config file!(2)\n");
+        fclose(STTRAMCellConfig);
+    }
+    if (STTRAMFIConfig==NULL) {
+          printf("The STT-RAM fault injection config file could not be opened!\n");
+    }
+    else {
+    	if (fgets(stringTemp0, sizeof(stringTemp0), STTRAMFIConfig) != NULL) {
+    				int temp_flag;
+    	            while(STTRAMFIConfig) {
+    	            	if(fscanf(STTRAMFIConfig, "%s %d %s", stringTemp0, &temp_flag, stringTemp1) == 3) {
+    	            		printf("Man Injam \n");
+    	            		if(!strcmp(stringTemp0, "L1IerrorEnable")) {
+								if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags"))
+									faultInjection = temp_flag;
+							}
+    	            		else if(!strcmp(stringTemp0, "L1DerrorEnable")) {
+								if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags"))
+									faultInjection = temp_flag;
+							}
+    	            		else if(!strcmp(stringTemp0, "L2errorEnable")) {
+								if(name() == "system.l2.tags")
+									faultInjection = temp_flag;
+							}
+    	            		else {
+								printf("Errors in reading STT-RAM fault injection config file!(1)\n");
+								break;
+							}
+    	            	}
+    	            	else
+							break;
+    	            }
+    	}
+		else
+			printf("Errors in reading STT-RAM fault injection config file!(2)\n");
+    	fclose(STTRAMFIConfig);
     }
     //AMHM End
 

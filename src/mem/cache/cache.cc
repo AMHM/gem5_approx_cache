@@ -112,46 +112,43 @@ Cache::~Cache()
 //AMHM Start
 Cache::Approximation::Approximation()
 {
-    for(int i = 0; i < 1000; i++) {
-        appTable[i].start = 0xffffffff;
-        appTable[i].end = 0x00000000;
-        appTable[i].reliabilityLevel = 0;
-    }
-    lastentryIndex = 0;
 }
 
 void
 Cache::Approximation::appTableInsert(Addr start, Addr end, uint32_t reliabilityLevel)
 {
     //Check the existence of the current addresses in the table
-    for(int i = 0; i < lastentryIndex; i++)
-        if((start == appTable[i].start) && (end == appTable[i].end)) {
-            appTable[i].reliabilityLevel = reliabilityLevel; //Only update the reliability level!
-            return;
-        }
-    appTable[lastentryIndex].start = start;
-    appTable[lastentryIndex].end = end;
-    appTable[lastentryIndex].reliabilityLevel = reliabilityLevel;
-    lastentryIndex++;
+	for(std::list<Table>::iterator iterator = appTable.begin(); iterator != appTable.end(); ++iterator) {
+		if((start == iterator->start) && (end == iterator->end)) {
+		            iterator->reliabilityLevel = reliabilityLevel; //Only update the reliability level!
+		            return;
+		        }
+	}
+	Table temp;
+	temp.start = start;
+	temp.end = end;
+	temp.reliabilityLevel = reliabilityLevel;
+	appTable.push_back(temp);
 }
 
 void
 Cache::Approximation::appTableRemove(Addr start, Addr end, uint32_t reliabilityLevel)
 {
     //Check the existence of the current addresses in the table
-    for(int i = 0; i < lastentryIndex; i++)
-        if((start == appTable[i].start) && (end == appTable[i].end)) {
-            appTable[i].reliabilityLevel = 0; //Only update the reliability level!
+	for(std::list<Table>::iterator iterator = appTable.begin(); iterator != appTable.end(); ++iterator) {
+        if((start == iterator->start) && (end == iterator->end)) {
+            appTable.erase(iterator);
             return;
         }
+	}
 }
 
 uint32_t
 Cache::Approximation::appTableCheck(Addr address)
 {
-    for(int i = 0; i < lastentryIndex; i++) {
-        if((address >= appTable[i].start) && (address <= appTable[i].end)) {
-            return (char) appTable[i].reliabilityLevel;
+	for(std::list<Table>::const_iterator iterator = appTable.begin(); iterator != appTable.end(); ++iterator) {
+        if((address >= iterator->start) && (address <= iterator->end)) {
+            return (char) iterator->reliabilityLevel;
         }
     }
     return 0;
@@ -216,7 +213,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                           } 
-                         if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (name() == "system.l2"))
+                         if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (tags->faultInjection))
                             if(((double) (rand() % RAND_MAX) / RAND_MAX) < writeErrorRate) {
                                 new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                                 totalNumberOfWriteErrorFaultInjection++;
@@ -269,7 +266,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                     }  
-                    if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (name() == "system.l2"))
+                    if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (tags->faultInjection))
                       if ((setBit[i] & 0x01) == 1){
                           if(((double) (rand() % RAND_MAX) / RAND_MAX) < readErrorRate) {
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
@@ -295,7 +292,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
 			}
     }
     //applying the faults
-    if(name() == "system.l2"){
+    if(tags->faultInjection){
       if((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3)) {
     	  return 1;
       } else{
@@ -1898,12 +1895,12 @@ Cache::writebackBlk(CacheBlk *blk)
     	//At first we should lookup the page table to retrieve the virtual address from physical address
     	Addr p_page_addr;
     	Addr searchAddress = 0;
-    	for(int i = 0; i < approxTable.lastentryIndex; i++) {
-    		searchAddress = approxTable.appTable[i].start;
-    		while(searchAddress < (approxTable.appTable[i].end - blkSize)){
+    	for(std::list<Table>::const_iterator iterator = approxTable.appTable.begin(); iterator != approxTable.appTable.end(); ++iterator) {
+    		searchAddress = iterator->start;
+    		while(searchAddress < (iterator->end - blkSize)){
 				if(myPageTable->translate(searchAddress, p_page_addr)){
 					if(p_page_addr == pkt->getAddr()){
-						pkt->reliabilityLevel = approxTable.appTable[i].reliabilityLevel;
+						pkt->reliabilityLevel = iterator->reliabilityLevel;
 					}
 				}
 				searchAddress += blkSize;
