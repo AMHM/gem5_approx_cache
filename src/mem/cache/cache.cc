@@ -94,8 +94,8 @@ Cache::Cache(const CacheParams *p)
     if (prefetcher)
         prefetcher->setCache(this);
     //AMHM Start
-    new_data = new uint8_t[blkSize];
-    old_data = new uint8_t[blkSize];
+    new_data = (uint8_t *) malloc(blkSize);
+    old_data = (uint8_t *) malloc(blkSize);
     alreadyCalculatedStatsOperation = 0;
     //AMHM End
 }
@@ -112,6 +112,7 @@ Cache::~Cache()
 //AMHM Start
 Cache::Approximation::Approximation()
 {
+	srand(time(NULL));
 }
 
 void
@@ -148,7 +149,9 @@ Cache::Approximation::appTableCheck(Addr address)
 {
 	for(std::list<Table>::const_iterator iterator = appTable.begin(); iterator != appTable.end(); ++iterator) {
         if((address >= iterator->start) && (address <= iterator->end)) {
-            return (char) iterator->reliabilityLevel;
+//        	printf("Address: 0x%lx End: 0x%lx\n", address, iterator->end);
+//        	printf("Reliability level: %d\n", iterator->reliabilityLevel);
+        	return (char) iterator->reliabilityLevel;
         }
     }
     return 0;
@@ -163,9 +166,11 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   double writeErrorRate = 0;
   double dynamicReadEnergy = 0;
   double dynamicWriteEnergy = 0;
-  //Setting the srand() to obtain same result for different run
-  srand(time(NULL));
   //initialization
+  free(new_data);
+  free(old_data);
+  new_data = (uint8_t *) malloc(blkSize);
+  old_data = (uint8_t *) malloc(blkSize);
   for (int i = 0; i < blkSize; i++){
     new_data[i] = 0;
     old_data[i] = 0;
@@ -175,14 +180,19 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   //If the packet is not read and is not write, we should not consider it!
   if ((!pkt->isRead()) && (!pkt->isWrite()))
     return 0;
+  //We should not consider the packets that does not need response in L1 data caches
+  if ((!pkt->needsResponse()) && (myPageTable != nullptr))
+  	return 0;
   //If the packet is not read and is not write, we should not consider it!
   if (pkt->isRead())
   {
     std::memcpy(old_data, blk->data, blkSize);
     std::memcpy(new_data, old_data, blkSize);
   } else {
-    std::memcpy(new_data, pkt->getConstPtr<uint8_t>(), blkSize);
-    std::memcpy(old_data, blk->data, blkSize);
+	  	if (!pkt->hasData())
+	  		return 0;
+		std::memcpy((new_data+pkt->getOffset(blkSize)), pkt->getConstPtr<uint8_t>(), pkt->getSize());
+		std::memcpy(old_data, blk->data, blkSize);
   }
   if (readWrite) { //write
             //setting the error rates and dynamic energy consumptions based on the reliability levels
@@ -270,7 +280,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                       if ((setBit[i] & 0x01) == 1){
                           if(((double) (rand() % RAND_MAX) / RAND_MAX) < readErrorRate) {
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
-                              totalNumberOfReadDisturbedBits++;                    
+                              totalNumberOfReadDisturbedBits++;
                           }
                       }
                     setBit[i] >>= 1; // shift bits, removing lower bit
@@ -294,7 +304,9 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
     //applying the faults
     if(tags->faultInjection){
       if((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3)) {
-    	  return 1;
+		  std::memcpy((old_data+pkt->getOffset(blkSize)), (new_data+pkt->getOffset(blkSize)), pkt->getSize());
+		  std::memcpy(new_data,old_data,blkSize);
+		  return 1;
       } else{
           return 0;
       }
@@ -319,7 +331,8 @@ Cache::cmpAndSwap(CacheBlk *blk, PacketPtr pkt)
     uint32_t condition_val32;
 
     int offset = tags->extractBlkOffset(pkt->getAddr());
-    uint8_t *blk_data = blk->data + offset;
+
+    uint8_t *blk_data;
 
     assert(sizeof(uint64_t) >= pkt->getSize());
 
@@ -329,10 +342,12 @@ Cache::cmpAndSwap(CacheBlk *blk, PacketPtr pkt)
     //AMHM Start
     if(!STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1)) {
       pkt->writeData((uint8_t *)&overwrite_val);
+      blk_data = blk->data + offset;
       pkt->setData(blk_data);
     } else {
       pkt->writeData((uint8_t *)&overwrite_val);
-      pkt->setData(new_data);
+      blk_data = new_data + offset;
+      pkt->setData(blk_data);
     }
     //AMHM End
 
@@ -418,8 +433,8 @@ Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
         if (temp == 0) // No fault injection!
           pkt->setDataFromBlock(blk->data, blkSize);
         else { // Fault Injection to both current packet and cache memory
-          pkt->setDataFromBlock(new_data, blkSize);
           std::memcpy(blk->data, new_data, blkSize);
+          pkt->setDataFromBlock(blk->data, blkSize);
         }
         //AMHM End
 
@@ -522,6 +537,13 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
     //AMHM Start
     bool temp = 0;
     //AMHM End
+
+    //AMHM Start
+    if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+    		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+    	}
+    //AMHM End
+
     // sanity check
     assert(pkt->isRequest());
 
@@ -667,7 +689,6 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
 
         //AMHM Start
         // if the writeback request does not face with miss we should perform statistics operations 
-        
         temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1);
         
         if(!temp) {
@@ -874,13 +895,13 @@ Cache::recvTimingReq(PacketPtr pkt)
     // Just forward the packet if caches are disabled.
     if (system->bypassCaches()) {
         // @todo This should really enqueue the packet rather
-    	//AMHM Start
-		//Setting the reliability level of the arrived packet
-		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
-		}
-		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(pkt);
+        //AMHM Start
+       	//Setting the reliability level of the arrived packet
+       	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+       		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
+       	}
+       	//AMHM End
         assert(success);
         return true;
     }
@@ -934,12 +955,6 @@ Cache::recvTimingReq(PacketPtr pkt)
         // this express snoop travels towards the memory, and at
         // every crossbar it is snooped upwards thus reaching
         // every cache in the system
-        //AMHM Start
-		//Setting the reliability level of the arrived packet
-		if((snoop_pkt->req->hasVaddr()) && (myPageTable != nullptr)){
-			snoop_pkt->reliabilityLevel = approxTable.appTableCheck(snoop_pkt->req->getVaddr());
-		}
-		//AMHM End
         bool M5_VAR_USED success = memSidePort->sendTimingReq(snoop_pkt);
         // express snoops always succeed
         assert(success);
@@ -1867,7 +1882,11 @@ Cache::recvTimingResp(PacketPtr pkt)
 PacketPtr
 Cache::writebackBlk(CacheBlk *blk)
 {
-    chatty_assert(!isReadOnly || writebackClean,
+    //AMHM Start
+	bool temp;
+	//AMHM End
+
+	chatty_assert(!isReadOnly || writebackClean,
                   "Writeback from read-only cache");
     assert(blk && blk->isValid() && (blk->isDirty() || writebackClean));
 
@@ -1921,8 +1940,15 @@ Cache::writebackBlk(CacheBlk *blk)
     blk->status &= ~BlkDirty;
 
     pkt->allocate();
-    STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 0);
-    std::memcpy(pkt->getPtr<uint8_t>(), blk->data, blkSize);
+
+    //AMHM Sart
+    temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 0);
+    if(!temp)
+    	std::memcpy(pkt->getPtr<uint8_t>(), blk->data, blkSize);
+    else {
+    	std::memcpy(pkt->getPtr<uint8_t>(), new_data, blkSize);
+    }
+    //AMHM End
 
     return pkt;
 }

@@ -731,15 +731,19 @@ add_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata)
     switch (tc->getCpuPtr()->system->cacheLineSize()) {
         case 16 : start = start & 0xfffffff0;
                   end = end & 0xfffffff0;
+                  end = end - 1;
                   break;
         case 32 : start = start & 0xffffffe0;
                   end = end & 0xffffffe0;
+                  end = end - 1;
                   break;
         case 64 : start = start & 0xffffffc0;
                   end = end & 0xffffffc0;
+                  end = end - 1;
                   break;
         case 128: start = start & 0xffffff80;
                   end = end & 0xffffff80;
+                  end = end - 1;
                   break;
         default : return;
     }
