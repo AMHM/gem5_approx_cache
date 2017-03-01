@@ -176,7 +176,28 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
     old_data[i] = 0;
     setBit[i] = 0;
   }
-
+//  if(myPageTable != nullptr){
+//	  if(pkt->isRead())
+//		  printf("Read\n");
+//	  if(pkt->isWrite())
+//		  printf("Write\n");
+//	  if(pkt->needsResponse())
+//		  printf("Needs Response\n");
+//	  if(pkt->isRequest())
+//		  printf("Request\n");
+//	  if(pkt->isResponse())
+//		  printf("Response\n");
+//	  if(pkt->isUpgrade())
+//		  printf("Upgrade\n");
+//	  if(pkt->isInvalidate())
+//		  printf("Invalidate\n");
+//	  if(pkt->isError())
+//		  printf("Error\n");
+//	  if(pkt->isPrint())
+//		  printf("Print\n");
+//	  if(pkt->isFlush())
+//		  printf("Flush\n");
+//  }
   //If the packet is not read and is not write, we should not consider it!
   if ((!pkt->isRead()) && (!pkt->isWrite()))
     return 0;
@@ -340,6 +361,7 @@ Cache::cmpAndSwap(CacheBlk *blk, PacketPtr pkt)
     // keep a copy of our possible write value, and copy what is at the
     // memory address into the packet
     //AMHM Start
+    //printf("Man injam 1.\n");
     if(!STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1)) {
       pkt->writeData((uint8_t *)&overwrite_val);
       blk_data = blk->data + offset;
@@ -349,6 +371,7 @@ Cache::cmpAndSwap(CacheBlk *blk, PacketPtr pkt)
       blk_data = new_data + offset;
       pkt->setData(blk_data);
     }
+    //printf("Man injam 1'.\n");
     //AMHM End
 
     if (pkt->req->isCondSwap()) {
@@ -404,12 +427,14 @@ Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
         if (blk->checkWrite(pkt)) {
             //AMHM Start
             //We are going to write to cache!
+        	//printf("Man injam 2.\n");
             temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1);
             if (temp == 0) // No fault injection!
               pkt->writeDataToBlock(blk->data, blkSize);
             else { // Fault injection
               std::memcpy(blk->data, new_data, blkSize);
             }
+            //printf("Man injam 2'.\n");
             //AMHM End
         }
         // Always mark the line as dirty (and thus transition to the
@@ -429,6 +454,7 @@ Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
 
         //AMHM Start
         //We are going to read from cache!
+        //printf("Man injam 3.\n");
         temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 0);
         if (temp == 0) // No fault injection!
           pkt->setDataFromBlock(blk->data, blkSize);
@@ -436,6 +462,7 @@ Cache::satisfyRequest(PacketPtr pkt, CacheBlk *blk,
           std::memcpy(blk->data, new_data, blkSize);
           pkt->setDataFromBlock(blk->data, blkSize);
         }
+        //printf("Man injam 3'.\n");
         //AMHM End
 
         // determine if this read is from a (coherent) cache or not
@@ -689,6 +716,7 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
 
         //AMHM Start
         // if the writeback request does not face with miss we should perform statistics operations 
+        //printf("Man injam 4.\n");
         temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 1);
         
         if(!temp) {
@@ -697,6 +725,7 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
         else {
           std::memcpy(blk->data, new_data, blkSize);
         }
+        //printf("Man injam 4'.\n");
         //AMHM End
         DPRINTF(Cache, "%s new state is %s\n", __func__, blk->print());
         incHitCount(pkt);
@@ -1942,12 +1971,14 @@ Cache::writebackBlk(CacheBlk *blk)
     pkt->allocate();
 
     //AMHM Sart
+    //printf("Man injam 5.\n");
     temp = STTRAMFaultInjectionAndEnergyCalculation(blk, pkt, 0);
     if(!temp)
     	std::memcpy(pkt->getPtr<uint8_t>(), blk->data, blkSize);
     else {
     	std::memcpy(pkt->getPtr<uint8_t>(), new_data, blkSize);
     }
+    //printf("Man injam 5'.\n");
     //AMHM End
 
     return pkt;

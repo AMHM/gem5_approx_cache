@@ -763,6 +763,31 @@ remove_approx(ThreadContext *tc, uint32_t start, uint32_t end, uint32_t metadata
     Cache *l1dcache = dynamic_cast<Cache*>(l1dcache_port.getOwner());
     FuncPageTable *pt = dynamic_cast<FuncPageTable*>(tc->getProcessPtr()->pTable);
     l1dcache->setPageTable(pt);
+    if((end - start + 1) < tc->getCpuPtr()->system->cacheLineSize())
+            return;
+	//Aligning the addresses based on the cache block size
+	if((start % tc->getCpuPtr()->system->cacheLineSize()) != 0)
+	switch (tc->getCpuPtr()->system->cacheLineSize()) {
+		case 16 : start = start & 0xfffffff0;
+				  end = end & 0xfffffff0;
+				  end = end - 1;
+				  break;
+		case 32 : start = start & 0xffffffe0;
+				  end = end & 0xffffffe0;
+				  end = end - 1;
+				  break;
+		case 64 : start = start & 0xffffffc0;
+				  end = end & 0xffffffc0;
+				  end = end - 1;
+				  break;
+		case 128: start = start & 0xffffff80;
+				  end = end & 0xffffff80;
+				  end = end - 1;
+				  break;
+		default : return;
+	}
+	//Pointing to the next block which compeletly filled by the address range contents
+	start = start + tc->getCpuPtr()->system->cacheLineSize();
     l1dcache->approxTable.appTableRemove((Addr) start, (Addr) end, 0);
 }
 
