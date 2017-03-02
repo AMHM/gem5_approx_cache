@@ -160,7 +160,6 @@ Cache::Approximation::appTableCheck(Addr address)
 bool
 Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bool readWrite) //read:0 write:1
 {
-  uint8_t setBit[blkSize];
   uint8_t randomBitSet[8] = {0x1,0x2,0x4,0x8,0x10,0x20,0x40,0x80};
   double readErrorRate = 0;
   double writeErrorRate = 0;
@@ -174,7 +173,6 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   for (int i = 0; i < blkSize; i++){
     new_data[i] = 0;
     old_data[i] = 0;
-    setBit[i] = 0;
   }
 //  if(myPageTable != nullptr){
 //	  if(pkt->isRead())
@@ -249,7 +247,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                                 new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                                 totalNumberOfWriteErrorFaultInjection++;
                             }
-                          totlaDynamicEnergyConsumption += dynamicWriteEnergy;
+                        totlaDynamicEnergyConsumption += dynamicWriteEnergy;
 
                 }
             switch (pkt->reliabilityLevel) {
@@ -268,9 +266,6 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
             }
     }
     else {//read
-            for (int i = 0; i < blkSize; i++)
-                //finding '1' bits
-                setBit[i] = old_data[i] & 0xff;
             for (int i = 0; i < blkSize; i++)
                 for (int j = 0; j < 8; j++) {
                     switch (pkt->reliabilityLevel) {
@@ -298,13 +293,10 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                                       break;  
                     }  
                     if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (tags->faultInjection))
-                      if ((setBit[i] & 0x01) == 1){
                           if(((double) (rand() % RAND_MAX) / RAND_MAX) < readErrorRate) {
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                               totalNumberOfReadDisturbedBits++;
                           }
-                      }
-                    setBit[i] >>= 1; // shift bits, removing lower bit
                     totlaDynamicEnergyConsumption += dynamicReadEnergy;
                 }
             switch (pkt->reliabilityLevel) {
