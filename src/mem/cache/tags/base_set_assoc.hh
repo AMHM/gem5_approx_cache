@@ -50,6 +50,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <string>
 #include <list>
 
 #include "mem/cache/base.hh"
@@ -58,6 +59,9 @@
 #include "mem/cache/tags/cacheset.hh"
 #include "mem/packet.hh"
 #include "params/BaseSetAssoc.hh"
+//AMHM Start
+#include "base/callback.hh"
+//AMHM End
 
 /**
  * A BaseSetAssoc cache tag store.
@@ -110,6 +114,8 @@ class BaseSetAssoc : public BaseTags
     unsigned setMask;
     /** Mask out all bits that aren't part of the block offset. */
     unsigned blkMask;
+
+    std::string outdir;
 
 public:
 
@@ -175,6 +181,10 @@ public:
      */
     CacheBlk *findBlockBySetAndWay(int set, int way) const override;
 
+    //AMHM Start
+    void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
+    void setAccessAnalysisOutput();
+    //AMHM End
     /**
      * Invalidate the given block.
      * @param blk The block to invalidate.

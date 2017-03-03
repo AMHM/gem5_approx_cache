@@ -57,6 +57,7 @@ class BaseCache(MemObject):
     response_latency = Param.Cycles("Latency for the return path on a miss");
     #AMHM Start
     write_latency = Param.Cycles("The write latency for this cache")
+    outdir = Param.String("gem5 output directory")
     #AMHM End
 
     max_miss_count = Param.Counter(0,

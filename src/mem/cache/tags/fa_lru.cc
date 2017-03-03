@@ -236,6 +236,20 @@ FALRU::findBlockBySetAndWay(int set, int way) const
     return &blks[way];
 }
 
+//AMHM Start
+void*
+FALRU::setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const
+{
+	return 0;
+}
+
+void
+FALRU::setAccessAnalysisOutput()
+{
+	return;
+}
+//AMHM End
+
 CacheBlk*
 FALRU::findVictim(Addr addr)
 {

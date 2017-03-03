@@ -65,7 +65,8 @@ using namespace std;
 BaseSetAssoc::BaseSetAssoc(const Params *p)
     :BaseTags(p), assoc(p->assoc), allocAssoc(p->assoc),
      numSets(p->size / (p->block_size * p->assoc)),
-     sequentialAccess(p->sequential_access)
+     sequentialAccess(p->sequential_access),
+	 outdir(p->outdir)
 {
     // Check parameters
     if (blkSize < 4 || !isPowerOf2(blkSize)) {
@@ -87,6 +88,11 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     char stringTemp1[500];
     double value1 = 0;
     double value2 = 0;
+
+    Callback* cb = new MakeCallback<BaseSetAssoc,
+                &BaseSetAssoc::setAccessAnalysisOutput>(this);
+    registerExitCallback(cb);
+
     if (STTRAMCellConfig==NULL) {
       printf("The STT-RAM cache config file could not be opened!\n");
     }
@@ -536,6 +542,14 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     for (unsigned i = 0; i < numSets; ++i) {
         sets[i].assoc = assoc;
 
+        //AMHM Start
+        sets[i].R0Accesses = 0;
+        sets[i].R1Accesses = 0;
+        sets[i].R2Accesses = 0;
+        sets[i].R3Accesses = 0;
+        sets[i].totalAccesses = 0;
+        //AMHM End
+
         sets[i].blks = new BlkType*[assoc];
 
         // link in the data blocks
@@ -728,6 +742,84 @@ CacheBlk*
 BaseSetAssoc::findBlockBySetAndWay(int set, int way) const
 {
     return sets[set].blks[way];
+}
+
+void*
+BaseSetAssoc::setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const
+{
+	switch (reliabilityLevel) {
+	    case 0 : sets[blk->set].R0Accesses++;
+	    		 sets[blk->set].totalAccesses++;
+	    		 break;
+	    case 1 : sets[blk->set].R1Accesses++;
+	    		 sets[blk->set].totalAccesses++;
+	    		 break;
+	    case 2 : sets[blk->set].R2Accesses++;
+	    		 sets[blk->set].totalAccesses++;
+	    		 break;
+	    case 3 : sets[blk->set].R3Accesses++;
+	    		 sets[blk->set].totalAccesses++;
+	    		 break;
+	    default : break;
+	}
+	return 0;
+}
+
+void
+BaseSetAssoc::setAccessAnalysisOutput()
+{
+	double averageR0ratio = 0;
+	double averageR1ratio = 0;
+	double averageR2ratio = 0;
+	double averageR3ratio = 0;
+
+	if(name()=="system.l2.tags")
+	{
+		std::cout<< outdir<<std::endl;
+		FILE * setAccessAnalysis;
+		char filename[160];
+		snprintf(filename,160,"%s/setAccessAnalysis.csv",outdir.data());
+		std::cout<<filename<<std::endl;
+		setAccessAnalysis = fopen(filename,"w");
+		if (setAccessAnalysis==NULL) {
+		    printf("The set analysis file could not be opened!\n");
+		    return;
+		}else{
+			fprintf(setAccessAnalysis," ,");
+			for (unsigned i = 0; i < numSets; ++i)
+				fprintf(setAccessAnalysis,"%d,",i);
+			fprintf(setAccessAnalysis,"\n");
+			fprintf(setAccessAnalysis,"L0,");
+			for (unsigned i = 0; i < numSets; ++i){
+				averageR0ratio += (double) sets[i].R0Accesses / sets[i].totalAccesses;
+				fprintf(setAccessAnalysis,"%f,",(double) sets[i].R0Accesses / sets[i].totalAccesses);
+			}
+			fprintf(setAccessAnalysis,"\n");
+			fprintf(setAccessAnalysis,"L1,");
+			for (unsigned i = 0; i < numSets; ++i){
+				averageR1ratio += (double) sets[i].R1Accesses / sets[i].totalAccesses;
+				fprintf(setAccessAnalysis,"%f,",(double) sets[i].R1Accesses / sets[i].totalAccesses);
+			}
+			fprintf(setAccessAnalysis,"\n");
+			fprintf(setAccessAnalysis,"L2,");
+			for (unsigned i = 0; i < numSets; ++i){
+				averageR2ratio += (double) sets[i].R2Accesses / sets[i].totalAccesses;
+				fprintf(setAccessAnalysis,"%f,",(double) sets[i].R2Accesses / sets[i].totalAccesses);
+			}
+			fprintf(setAccessAnalysis,"\n");
+			fprintf(setAccessAnalysis,"L3,");
+			for (unsigned i = 0; i < numSets; ++i){
+				averageR3ratio += (double) sets[i].R3Accesses / sets[i].totalAccesses;
+				fprintf(setAccessAnalysis,"%f,",(double) sets[i].R3Accesses / sets[i].totalAccesses);
+			}
+			fprintf(setAccessAnalysis,"\n");
+			averageL0Access = (double) averageR0ratio / numSets;
+			averageL1Access = (double) averageR1ratio / numSets;
+			averageL2Access = (double) averageR2ratio / numSets;
+			averageL3Access = (double) averageR3ratio / numSets;
+			fclose(setAccessAnalysis);
+		}
+	}
 }
 
 std::string

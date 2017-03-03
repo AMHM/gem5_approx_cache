@@ -161,7 +161,23 @@ BaseTags::regStats()
         .name(name() + ".data_accesses")
         .desc("Number of data accesses")
         ;
-
+    //AMHM Start
+    averageL0Access
+            .name(name() + ".averageL0Access")
+            .desc("AMHM: Average ratio of L0 accesses to this cache")
+            ;
+    averageL1Access
+                .name(name() + ".averageL1Access")
+                .desc("AMHM: Average ratio of L1 accesses to this cache")
+                ;
+    averageL2Access
+                .name(name() + ".averageL2Access")
+                .desc("AMHM: Average ratio of L2 accesses to this cache")
+                ;
+    averageL3Access
+                .name(name() + ".averageL3Access")
+                .desc("AMHM: Average ratio of L3 accesses to this cache")
+                ;
     registerDumpCallback(new BaseTagsDumpCallback(this));
     registerExitCallback(new BaseTagsCallback(this));
 }

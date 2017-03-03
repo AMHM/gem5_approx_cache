@@ -165,7 +165,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   double writeErrorRate = 0;
   double dynamicReadEnergy = 0;
   double dynamicWriteEnergy = 0;
-  //initialization
+  //Initialization
   free(new_data);
   free(old_data);
   new_data = (uint8_t *) malloc(blkSize);
@@ -202,6 +202,8 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   //We should not consider the packets that does not need response in L1 data caches
   if ((!pkt->needsResponse()) && (myPageTable != nullptr))
   	return 0;
+  //Updating the access statistics
+  tags->setAccessAnalysis((unsigned int) pkt->reliabilityLevel, blk);
   //If the packet is not read and is not write, we should not consider it!
   if (pkt->isRead())
   {

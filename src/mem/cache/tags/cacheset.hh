@@ -60,6 +60,14 @@ class CacheSet
     /** The associativity of this set. */
     int assoc;
 
+    //AMHM Start
+    unsigned long int R0Accesses;
+    unsigned long int R1Accesses;
+    unsigned long int R2Accesses;
+    unsigned long int R3Accesses;
+    unsigned long int totalAccesses;
+    //AMHM End
+
     /** Cache blocks in this set, maintained in LRU order 0 = MRU. */
     Blktype **blks;
 

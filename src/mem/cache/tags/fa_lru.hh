@@ -263,6 +263,11 @@ public:
      */
     CacheBlk* findBlockBySetAndWay(int set, int way) const override;
 
+    //AMHM Start
+	void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
+	void setAccessAnalysisOutput();
+	//AMHM End
+
     /**
      * Align an address to the block size.
      * @param addr the address to align.

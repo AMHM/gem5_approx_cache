@@ -60,6 +60,7 @@ class BaseSetAssoc(BaseTags):
     assoc = Param.Int(Parent.assoc, "associativity")
     sequential_access = Param.Bool(Parent.sequential_access,
         "Whether to access tags and data sequentially")
+    outdir = Param.String(Parent.outdir, "gem5 output directory")
 
 class LRU(BaseSetAssoc):
     type = 'LRU'

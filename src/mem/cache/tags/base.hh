@@ -135,6 +135,11 @@ class BaseTags : public ClockedObject
     /** Number of data blocks consulted over all accesses. */
     Stats::Scalar dataAccesses;
 
+    //AMHM Start
+    Stats::Scalar averageL0Access;
+    Stats::Scalar averageL1Access;
+    Stats::Scalar averageL2Access;
+    Stats::Scalar averageL3Access;
     /**
      * @}
      */
@@ -242,6 +247,11 @@ class BaseTags : public ClockedObject
      * @return The cache block.
      */
     virtual CacheBlk *findBlockBySetAndWay(int set, int way) const = 0;
+
+    //AMHM Start
+    virtual void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const = 0;
+    virtual void setAccessAnalysisOutput() = 0;
+    //AMHM End
 
     /**
      * Limit the allocation for the cache ways.
