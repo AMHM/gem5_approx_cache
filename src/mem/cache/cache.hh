@@ -91,6 +91,10 @@ class Cache : public BaseCache
 		std::list <Table> appTable;
 	};
 	Approximation approxTable;
+	struct checkPoint {
+		bool taken;
+	};
+	checkPoint *snapshot;
 	//AMHM End
   public:
 

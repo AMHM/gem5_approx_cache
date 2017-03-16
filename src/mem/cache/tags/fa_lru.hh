@@ -264,8 +264,8 @@ public:
     CacheBlk* findBlockBySetAndWay(int set, int way) const override;
 
     //AMHM Start
-	void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
-	void setAccessAnalysisOutput();
+	void *wayAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
+	void wayAccessAnalysisOutput();
 	//AMHM End
 
     /**

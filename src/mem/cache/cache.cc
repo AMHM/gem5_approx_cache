@@ -97,6 +97,9 @@ Cache::Cache(const CacheParams *p)
     new_data = (uint8_t *) malloc(blkSize);
     old_data = (uint8_t *) malloc(blkSize);
     alreadyCalculatedStatsOperation = 0;
+    snapshot = new checkPoint[1000]; // We want to perform checkpointing for maximum of 1000 snapshots!
+    for(int i = 0; i < 1000; i++)
+    	snapshot[i].taken = 0;
     //AMHM End
 }
 
@@ -203,7 +206,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   if ((!pkt->needsResponse()) && (myPageTable != nullptr))
   	return 0;
   //Updating the access statistics
-  tags->setAccessAnalysis((unsigned int) pkt->reliabilityLevel, blk);
+  tags->wayAccessAnalysis((unsigned int) pkt->reliabilityLevel, blk);
   //If the packet is not read and is not write, we should not consider it!
   if (pkt->isRead())
   {
@@ -557,6 +560,18 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
 {
     //AMHM Start
     bool temp = 0;
+    //AMHM End
+
+    //AMHM Start
+    //Taking snapshot from set and way access distribution
+    	if((curTick() / 1000000000) > 0) //We ignore first 1ms
+    	{
+    		if((curTick() / 1000000000) < 1000)
+    			if(!snapshot[(curTick() / 1000000000)].taken){
+    				tags->wayAccessAnalysisOutput();
+    				snapshot[(curTick() / 1000000000)].taken = 1; //snapshot taken!
+    			}
+    	}
     //AMHM End
 
     //AMHM Start

@@ -182,8 +182,16 @@ public:
     CacheBlk *findBlockBySetAndWay(int set, int way) const override;
 
     //AMHM Start
-    void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
-    void setAccessAnalysisOutput();
+    struct way{
+    	unsigned long int L0Accesses;
+    	unsigned long int L1Accesses;
+    	unsigned long int L2Accesses;
+    	unsigned long int L3Accesses;
+    	unsigned long int totalAccess;
+    };
+    void *wayAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const override;
+    void wayAccessAnalysisOutput();
+    way *cacheWay;
     //AMHM End
     /**
      * Invalidate the given block.

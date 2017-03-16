@@ -249,8 +249,8 @@ class BaseTags : public ClockedObject
     virtual CacheBlk *findBlockBySetAndWay(int set, int way) const = 0;
 
     //AMHM Start
-    virtual void *setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const = 0;
-    virtual void setAccessAnalysisOutput() = 0;
+    virtual void *wayAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const = 0;
+    virtual void wayAccessAnalysisOutput() = 0;
     //AMHM End
 
     /**

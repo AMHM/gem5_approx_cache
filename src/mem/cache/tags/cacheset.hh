@@ -61,10 +61,10 @@ class CacheSet
     int assoc;
 
     //AMHM Start
-    unsigned long int R0Accesses;
-    unsigned long int R1Accesses;
-    unsigned long int R2Accesses;
-    unsigned long int R3Accesses;
+    unsigned long int L0Accesses;
+    unsigned long int L1Accesses;
+    unsigned long int L2Accesses;
+    unsigned long int L3Accesses;
     unsigned long int totalAccesses;
     //AMHM End
 

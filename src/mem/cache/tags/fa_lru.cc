@@ -238,13 +238,13 @@ FALRU::findBlockBySetAndWay(int set, int way) const
 
 //AMHM Start
 void*
-FALRU::setAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const
+FALRU::wayAccessAnalysis(unsigned int reliabilityLevel, CacheBlk *blk) const
 {
 	return 0;
 }
 
 void
-FALRU::setAccessAnalysisOutput()
+FALRU::wayAccessAnalysisOutput()
 {
 	return;
 }
