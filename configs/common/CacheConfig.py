@@ -87,7 +87,8 @@ def config_cache(options, system):
         system.l2 = l2_cache_class(clk_domain=system.cpu_clk_domain,
                                    size=options.l2_size,
                                    assoc=options.l2_assoc,
-                                   outdir=options.cache_set_data)
+                                   outdir=options.cache_set_data,
+                                   sttmram=options.sttmram)
 
         system.tol2bus = L2XBar(clk_domain = system.cpu_clk_domain)
         system.l2.cpu_side = system.tol2bus.master
@@ -100,10 +101,12 @@ def config_cache(options, system):
         if options.caches:
             icache = icache_class(size=options.l1i_size,
                                   assoc=options.l1i_assoc,
-                                  outdir=options.cache_set_data)
+                                  outdir=options.cache_set_data,
+                                  sttmram=options.sttmram)
             dcache = dcache_class(size=options.l1d_size,
                                   assoc=options.l1d_assoc,
-                                  outdir=options.cache_set_data)
+                                  outdir=options.cache_set_data,
+                                  sttmram=options.sttmram)
 
             # If we have a walker cache specified, instantiate two
             # instances here

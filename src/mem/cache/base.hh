@@ -269,9 +269,10 @@ class BaseCache : public MemObject
     const Cycles lookupLatency;
 
     //AMHM Start
-    /* The latency of a write in this device.
-     */
+    //The latency of a write in this device.
     const Cycles writeLatency;
+    //Approx table to TLB query latency
+    const Cycles addressLookupLatency;
     //AMHM End
 
     /**
@@ -355,6 +356,8 @@ class BaseCache : public MemObject
 	Stats::Scalar totalNumberOfWriteR2;
 	//Total number of writes in reliability level 3 mode in cache
 	Stats::Scalar totalNumberOfWriteR3;
+	//Total number of writebacks in this cache
+	Stats::Scalar totalNumberOfWriteback;
     //AMHM End
 
     // Statistics

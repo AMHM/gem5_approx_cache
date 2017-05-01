@@ -359,6 +359,7 @@ class Packet : public Printable
 
     //AMHM Start
 	uint32_t reliabilityLevel;
+	uint32_t virtualAddressLookupCost;
 	//AMHM End
 
     /**
@@ -705,7 +706,7 @@ class Packet : public Printable
     //AMHM Start
     Packet(const RequestPtr _req, MemCmd _cmd)
         :  cmd(_cmd), req(_req), data(nullptr), addr(0), _isSecure(false),
-           size(0), headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0),
+           size(0), headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0), virtualAddressLookupCost(0),
            senderState(NULL)
     {
         if (req->hasPaddr()) {
@@ -726,7 +727,7 @@ class Packet : public Printable
      */
     Packet(const RequestPtr _req, MemCmd _cmd, int _blkSize)
         :  cmd(_cmd), req(_req), data(nullptr), addr(0), _isSecure(false),
-           headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0),
+           headerDelay(0), snoopDelay(0), payloadDelay(0), reliabilityLevel(0), virtualAddressLookupCost(0),
            senderState(NULL)
     {
         if (req->hasPaddr()) {
@@ -754,6 +755,7 @@ class Packet : public Printable
            snoopDelay(0),
            payloadDelay(pkt->payloadDelay),
 		   reliabilityLevel(0),
+		   virtualAddressLookupCost(0),
            senderState(pkt->senderState)
     {
         if (!clear_flags)

@@ -75,6 +75,7 @@ BaseCache::BaseCache(const BaseCacheParams *p, unsigned blk_size)
       lookupLatency(p->hit_latency),
       //AMHM Start
       writeLatency(p->write_latency),
+	  addressLookupLatency(p->address_lookup_latemcy),
       //AMHM End
       forwardLatency(p->hit_latency),
       fillLatency(p->response_latency),
@@ -228,6 +229,10 @@ BaseCache::regStats()
     		.name(name() + ".totalNumberOfWriteR3")
     		.desc("AMHM: Total number of writes in reliability level 3 mode in cache")
     		;
+    totalNumberOfWriteback
+			.name(name() + ".totalNumberOfWriteback")
+			.desc("AMHM: Total number of dirty block writebacks in cache")
+			;
     //AMHM End
 
     // Hit statistics

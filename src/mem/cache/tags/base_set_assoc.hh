@@ -116,6 +116,7 @@ class BaseSetAssoc : public BaseTags
     unsigned blkMask;
 
     std::string outdir;
+    std::string sttmram;
 
 public:
 

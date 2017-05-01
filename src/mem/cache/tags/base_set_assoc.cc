@@ -66,7 +66,8 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     :BaseTags(p), assoc(p->assoc), allocAssoc(p->assoc),
      numSets(p->size / (p->block_size * p->assoc)),
      sequentialAccess(p->sequential_access),
-	 outdir(p->outdir)
+	 outdir(p->outdir),
+	 sttmram(p->sttmram)
 {
     // Check parameters
     if (blkSize < 4 || !isPowerOf2(blkSize)) {
@@ -81,9 +82,13 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
 
     //AMHM Start
     FILE * STTRAMCellConfig;
-    STTRAMCellConfig = fopen ("//data//users//monazzah//gem5-approx-cache//configs//common//STT-RAMCacheConfig.cfg", "r");
+    char filename0[160];
+	snprintf(filename0,160,"%s/STT-RAMCacheConfig.cfg",sttmram.data());
+    STTRAMCellConfig = fopen (filename0, "r");
     FILE * STTRAMFIConfig;
-    STTRAMFIConfig = fopen ("//data//users//monazzah//gem5-approx-cache//configs//common//STTRAMFIConfig.cfg", "r");
+    char filename1[160];
+	snprintf(filename1,160,"%s/STTRAMFIConfig.cfg",sttmram.data());
+    STTRAMFIConfig = fopen (filename1, "r");
     char stringTemp0[500];
     char stringTemp1[500];
     double value1 = 0;
@@ -492,6 +497,8 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
         	printf("Errors in reading STT-RAM cache config file!(2)\n");
         fclose(STTRAMCellConfig);
     }
+    faultInjection = 0;
+    approximation = 0;
     if (STTRAMFIConfig==NULL) {
           printf("The STT-RAM fault injection config file could not be opened!\n");
     }
@@ -500,7 +507,11 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
     				int temp_flag;
     	            while(STTRAMFIConfig) {
     	            	if(fscanf(STTRAMFIConfig, "%s %d %s", stringTemp0, &temp_flag, stringTemp1) == 3) {
-    	            		if(!strcmp(stringTemp0, "L1IerrorEnable")) {
+    	            		if(!strcmp(stringTemp0, "Approximation")) {
+								if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags"))
+									approximation = temp_flag;
+							}
+    	            		else if(!strcmp(stringTemp0, "L1IerrorEnable")) {
 								if((name() == "system.cpu.icache.tags")||(name() == "system.cpu0.icache.tags")||(name() == "system.cpu1.icache.tags")||(name() == "system.cpu2.icache.tags")||(name() == "system.cpu3.icache.tags"))
 									faultInjection = temp_flag;
 							}
@@ -794,12 +805,10 @@ BaseSetAssoc::wayAccessAnalysisOutput()
 
 	if(name()=="system.l2.tags")
 	{
-		std::cout<< outdir<<std::endl;
 		FILE * setAccess;
 		FILE * wayAccess;
 		char filename0[160];
 		snprintf(filename0,160,"%s/setAccessAnalysis.csv",outdir.data());
-		std::cout<<filename0<<std::endl;
 		setAccess = fopen(filename0,"a");
 		if (setAccess==NULL) {
 		    printf("The set analysis file could not be opened!\n");
@@ -857,7 +866,6 @@ BaseSetAssoc::wayAccessAnalysisOutput()
 		}
 		char filename1[160];
 		snprintf(filename1,160,"%s/wayAccessAnalysis.csv",outdir.data());
-		std::cout<<filename1<<std::endl;
 		wayAccess = fopen(filename1,"a");
 		if (wayAccess==NULL) {
 			printf("The way analysis file could not be opened!\n");

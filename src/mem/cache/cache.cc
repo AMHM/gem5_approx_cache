@@ -575,7 +575,7 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
     //AMHM End
 
     //AMHM Start
-    if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+    if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
     		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
     	}
     //AMHM End
@@ -617,13 +617,15 @@ Cache::access(PacketPtr pkt, CacheBlk *&blk, Cycles &lat,
         }
         //AMHM End
 
+
+
         return false;
     }
 
     //AMHM Start
     // Update latency decided by if it is read or write
     if(pkt->isWrite()) {
-    lat = writeLatency;
+    	lat = writeLatency;
     }
     //AMHM End
 
@@ -791,6 +793,10 @@ Cache::maintainClusivity(bool from_cache, CacheBlk *blk)
 void
 Cache::doWritebacks(PacketList& writebacks, Tick forward_time)
 {
+	//AMHM Start
+	Tick temp = 0;
+	//AMHM End
+
     while (!writebacks.empty()) {
         PacketPtr wbPkt = writebacks.front();
         // We use forwardLatency here because we are copying writebacks to
@@ -815,14 +821,22 @@ Cache::doWritebacks(PacketList& writebacks, Tick forward_time)
                 // the Writeback does not reset the bit corresponding to this
                 // address in the snoop filter below.
                 wbPkt->setBlockCached();
-                allocateWriteBuffer(wbPkt, forward_time);
+                //AMHM Start
+                temp = forward_time - curTick() + (Tick) wbPkt->virtualAddressLookupCost * cyclesToTicks(addressLookupLatency);
+				temp = clockEdge(ticksToCycles(temp));
+				allocateWriteBuffer(wbPkt, temp);
+                //AMHM End
             }
         } else {
             // If the block is not cached above, send packet below. Both
             // CleanEvict and Writeback with BLOCK_CACHED flag cleared will
             // reset the bit corresponding to this address in the snoop filter
             // below.
-            allocateWriteBuffer(wbPkt, forward_time);
+        	//AMHM Start
+        	temp = forward_time - curTick() + (Tick) wbPkt->virtualAddressLookupCost * cyclesToTicks(addressLookupLatency);
+        	temp = clockEdge(ticksToCycles(temp));
+			allocateWriteBuffer(wbPkt, temp);
+			//AMHM End
         }
         writebacks.pop_front();
     }
@@ -936,7 +950,7 @@ Cache::recvTimingReq(PacketPtr pkt)
         bool M5_VAR_USED success = memSidePort->sendTimingReq(pkt);
         //AMHM Start
        	//Setting the reliability level of the arrived packet
-       	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+       	if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
        		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
        	}
        	//AMHM End
@@ -1334,7 +1348,7 @@ Cache::recvAtomic(PacketPtr pkt)
     if (system->bypassCaches()){
     	//AMHM Start
 		//Setting the reliability level of the arrived packet
-		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 		}
 		//AMHM End
@@ -1355,7 +1369,7 @@ Cache::recvAtomic(PacketPtr pkt)
         // copies that are not on the same path to memory
         //AMHM Start
 		//Setting the reliability level of the arrived packet
-		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 		}
 		//AMHM End
@@ -1386,7 +1400,7 @@ Cache::recvAtomic(PacketPtr pkt)
             (pkt->req->isUncacheable() && pkt->isWrite())) {
         	//AMHM Start
 			//Setting the reliability level of the arrived packet
-			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 			}
 			//AMHM End
@@ -1529,7 +1543,7 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
         // so we don't need to check if we need to update anything.
         //AMHM Start
 		//Setting the reliability level of the arrived packet
-		if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+		if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 			pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 		}
 		//AMHM End
@@ -1584,7 +1598,7 @@ Cache::functionalAccess(PacketPtr pkt, bool fromCpuSide)
         if (fromCpuSide) {
         	//AMHM Start
 			//Setting the reliability level of the arrived packet
-			if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+			if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 				pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 			}
 			//AMHM End
@@ -1770,7 +1784,7 @@ Cache::recvTimingResp(PacketPtr pkt)
                 // the core.
                 completion_time += clockEdge(responseLatency) +
                     //AMHM Start
-                    writeLatency * clockPeriod() + 
+                    writeLatency * clockPeriod() +
                     //AMHM End
                     (transfer_offset ? pkt->payloadDelay : 0);
 
@@ -1948,22 +1962,31 @@ Cache::writebackBlk(CacheBlk *blk)
 
     //AMHM Start
     //Assigning the corresponding reliability level to the generated packet!
-    if(myPageTable != nullptr){
+    if((myPageTable != nullptr) && (blk->isDirty()) && (tags->approximation)){
     	//At first we should lookup the page table to retrieve the virtual address from physical address
     	Addr p_page_addr;
     	Addr searchAddress = 0;
-    	for(std::list<Table>::const_iterator iterator = approxTable.appTable.begin(); iterator != approxTable.appTable.end(); ++iterator) {
+    	unsigned int virtualAddressLookupCost = 0;
+    	bool addressFound = 0;
+    	for(std::list<Table>::const_iterator iterator = approxTable.appTable.begin(); (iterator != approxTable.appTable.end()) && (!addressFound); ++iterator) {
     		searchAddress = iterator->start;
     		while(searchAddress < (iterator->end - blkSize)){
+    			virtualAddressLookupCost++;
 				if(myPageTable->translate(searchAddress, p_page_addr)){
 					if(p_page_addr == pkt->getAddr()){
 						pkt->reliabilityLevel = iterator->reliabilityLevel;
+						addressFound = 1;
+						break;
 					}
 				}
 				searchAddress += blkSize;
     		}
     	}
+    	pkt->virtualAddressLookupCost = virtualAddressLookupCost;
     }
+    if(blk->isDirty())
+    	totalNumberOfWriteback++;
+    //AMHM End
 
     if (blk->isWritable()) {
         // not asserting shared means we pass the block in modified
@@ -2055,15 +2078,38 @@ Cache::writebackVisitor(CacheBlk &blk)
         packet.dataStatic(blk.data);
 
         //AMHM Start
-		//Setting the reliability level of the arrived packet
-		if((packet.req->hasVaddr()) && (myPageTable != nullptr)){
-			packet.reliabilityLevel = approxTable.appTableCheck(packet.req->getVaddr());
+		//Assigning the corresponding reliability level to the generated packet!
+		if((myPageTable != nullptr) && (tags->approximation)){
+			//At first we should lookup the page table to retrieve the virtual address from physical address
+			Addr p_page_addr;
+			Addr searchAddress = 0;
+			unsigned int virtualAddressLookupCost = 0;
+			bool addressFound = 0;
+			for(std::list<Table>::const_iterator iterator = approxTable.appTable.begin(); (iterator != approxTable.appTable.end()) && (!addressFound); ++iterator) {
+				searchAddress = iterator->start;
+				while(searchAddress < (iterator->end - blkSize)){
+					virtualAddressLookupCost++;
+					if(myPageTable->translate(searchAddress, p_page_addr)){
+						if(p_page_addr == packet.getAddr()){
+							packet.reliabilityLevel = iterator->reliabilityLevel;
+							addressFound = 1;
+							break;
+						}
+					}
+					searchAddress += blkSize;
+				}
+			}
+			packet.virtualAddressLookupCost = virtualAddressLookupCost;
 		}
 		//AMHM End
 
         memSidePort->sendFunctional(&packet);
 
         blk.status &= ~BlkDirty;
+
+        //AMHM Start
+        totalNumberOfWriteback++;
+        //AMHM End
     }
 
     return true;
@@ -2881,7 +2927,7 @@ Cache::sendMSHRQueuePacket(MSHR* mshr)
     pkt->pushSenderState(mshr);
     //AMHM Start
 	//Setting the reliability level of the arrived packet
-	if((pkt->req->hasVaddr()) && (myPageTable != nullptr)){
+	if((pkt->req->hasVaddr()) && (myPageTable != nullptr) && (tags->approximation)){
 		pkt->reliabilityLevel = approxTable.appTableCheck(pkt->req->getVaddr());
 	}
 	//AMHM End

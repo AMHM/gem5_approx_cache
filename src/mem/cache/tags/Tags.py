@@ -61,6 +61,7 @@ class BaseSetAssoc(BaseTags):
     sequential_access = Param.Bool(Parent.sequential_access,
         "Whether to access tags and data sequentially")
     outdir = Param.String(Parent.outdir, "gem5 output directory")
+    sttmram = Param.String(Parent.sttmram, "STT-MRAM parameters and config files path")
 
 class LRU(BaseSetAssoc):
     type = 'LRU'

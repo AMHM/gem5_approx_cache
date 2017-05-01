@@ -191,6 +191,7 @@ class BaseTags : public ClockedObject
     double dynamicWriteEnergyConsumptionLevel3Var;
     //Fault injection flag: 0: Disable 1: Enable
     bool faultInjection;
+    bool approximation;
     //AMHM End
 
     /**
