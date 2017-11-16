@@ -166,16 +166,20 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
   uint8_t randomBitSet[8] = {0x1,0x2,0x4,0x8,0x10,0x20,0x40,0x80};
   double readErrorRate = 0;
   double writeErrorRate = 0;
-  double dynamicReadEnergy = 0;
-  double dynamicWriteEnergy = 0;
   //Initialization
   free(new_data);
   free(old_data);
+  free(Transitions0To1);
+  free(Transitions1To0);
   new_data = (uint8_t *) malloc(blkSize);
   old_data = (uint8_t *) malloc(blkSize);
+  Transitions0To1 = (uint8_t *) malloc(blkSize);
+  Transitions1To0 = (uint8_t *) malloc(blkSize);
   for (int i = 0; i < blkSize; i++){
     new_data[i] = 0;
     old_data[i] = 0;
+    Transitions0To1[i] = 0;
+    Transitions1To0[i] = 0;
   }
 //  if(myPageTable != nullptr){
 //	  if(pkt->isRead())
@@ -219,30 +223,38 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
 		std::memcpy(old_data, blk->data, blkSize);
   }
   if (readWrite) { //write
+		  	//Detecting the type of transitions
+	  	  	for (int i = 0; i < blkSize; i++)
+	  	  	{
+	  	  		//Detecting 0->1 transitions
+	  	  		Transitions0To1[i] = ~old_data[i] & new_data[i];
+	  	  		//Detecting 1->0 transitions
+	  	  		Transitions1To0[i] = old_data[i] & ~new_data[i];
+	  	  	}
             //setting the error rates and dynamic energy consumptions based on the reliability levels
             //write failure fault injection
             for (int i = 0; i < blkSize; i++)
                 for (int j = 0; j < 8; j++) {
+                		 if((Transitions0To1[i] & 0x01) == 1)
+                			 totalNumberOf0to1++;
+                		 else if((Transitions1To0[i] & 0x01) == 1)
+                			 totalNumberOf1to0++;
+                		 else
+                			 totalNumberOfSteady++;
+                		 Transitions0To1[i] = Transitions0To1[i] >> 1;
+                		 Transitions1To0[i] = Transitions1To0[i] >> 1;
                          switch (pkt->reliabilityLevel) {
                             case 0 : readErrorRate = blk->readErrorRateLevel0[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel0[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel0[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel0[(i * 8) + j];
                                      break;
                             case 1 : readErrorRate = blk->readErrorRateLevel1[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel1[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel1[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel1[(i * 8) + j];
                                      break;
                             case 2 : readErrorRate = blk->readErrorRateLevel2[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel2[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel2[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel2[(i * 8) + j];
                                      break;
                             case 3 : readErrorRate = blk->readErrorRateLevel3[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel3[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel3[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel3[(i * 8) + j];
                                      break;
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
@@ -252,7 +264,6 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                                 new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                                 totalNumberOfWriteErrorFaultInjection++;
                             }
-                        totlaDynamicEnergyConsumption += dynamicWriteEnergy;
 
                 }
             switch (pkt->reliabilityLevel) {
@@ -276,23 +287,15 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                     switch (pkt->reliabilityLevel) {
                             case 0 : readErrorRate = blk->readErrorRateLevel0[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel0[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel0[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel0[(i * 8) + j];
                                      break;
                             case 1 : readErrorRate = blk->readErrorRateLevel1[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel1[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel1[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel1[(i * 8) + j];
                                      break;
                             case 2 : readErrorRate = blk->readErrorRateLevel2[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel2[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel2[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel2[(i * 8) + j];
                                      break;
                             case 3 : readErrorRate = blk->readErrorRateLevel3[(i * 8) + j];
                                      writeErrorRate = blk->writeErrorRateLevel3[(i * 8) + j];
-                                     dynamicReadEnergy = blk->dynamicReadEnergyConsumptionLevel3[(i * 8) + j];
-                                     dynamicWriteEnergy = blk->dynamicWriteEnergyConsumptionLevel3[(i * 8) + j];
                                      break;
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
@@ -302,7 +305,6 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                               totalNumberOfReadDisturbedBits++;
                           }
-                    totlaDynamicEnergyConsumption += dynamicReadEnergy;
                 }
             switch (pkt->reliabilityLevel) {
 				case 0 : totalNumberOfReads++;
@@ -320,6 +322,11 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
 			}
     }
     //applying the faults
+
+  	if(blk!=nullptr){
+	  //Saving the reliability level information in related field
+	  blk->reliabilityLevel = pkt->reliabilityLevel;
+	}
     if(tags->faultInjection){
       if((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3)) {
 		  std::memcpy((old_data+pkt->getOffset(blkSize)), (new_data+pkt->getOffset(blkSize)), pkt->getSize());
@@ -1962,7 +1969,10 @@ Cache::writebackBlk(CacheBlk *blk)
 
     //AMHM Start
     //Assigning the corresponding reliability level to the generated packet!
-    if((myPageTable != nullptr) && (blk->isDirty()) && (tags->approximation)){
+    if(tags->PEA){
+    	pkt->reliabilityLevel = blk->reliabilityLevel;
+    	pkt->virtualAddressLookupCost = 0;
+    } else if((myPageTable != nullptr) && (blk->isDirty()) && (tags->approximation)){
     	//At first we should lookup the page table to retrieve the virtual address from physical address
     	Addr p_page_addr;
     	Addr searchAddress = 0;
@@ -2079,7 +2089,10 @@ Cache::writebackVisitor(CacheBlk &blk)
 
         //AMHM Start
 		//Assigning the corresponding reliability level to the generated packet!
-		if((myPageTable != nullptr) && (tags->approximation)){
+        if(tags->PEA){
+        		packet.reliabilityLevel = blk.reliabilityLevel;
+        		packet.virtualAddressLookupCost = 0;
+        } else if((myPageTable != nullptr) && (tags->approximation)){
 			//At first we should lookup the page table to retrieve the virtual address from physical address
 			Addr p_page_addr;
 			Addr searchAddress = 0;

@@ -93,6 +93,9 @@ class CacheBlk
      * data stored here should be kept consistant with the actual data
      * referenced by this block.
      */
+
+    uint32_t reliabilityLevel;
+
     uint8_t *data;
     /** the number of bytes stored in this block. */
     unsigned size;
@@ -129,21 +132,13 @@ class CacheBlk
     double readErrorRateLevel1[512];
     double readErrorRateLevel2[512];
     double readErrorRateLevel3[512];
-    //Write erro rate per cell
+
+    //Write error rate per cell
     double writeErrorRateLevel0[512];
     double writeErrorRateLevel1[512];
     double writeErrorRateLevel2[512];
     double writeErrorRateLevel3[512];
-    //Energy consumption per line access for read
-    double dynamicReadEnergyConsumptionLevel0[512];
-    double dynamicReadEnergyConsumptionLevel1[512];
-    double dynamicReadEnergyConsumptionLevel2[512];
-    double dynamicReadEnergyConsumptionLevel3[512];
-    //Energy consumption per line access for write
-    double dynamicWriteEnergyConsumptionLevel0[512];
-    double dynamicWriteEnergyConsumptionLevel1[512];
-    double dynamicWriteEnergyConsumptionLevel2[512];
-    double dynamicWriteEnergyConsumptionLevel3[512];
+
     int randSeed; //Each block has a special seed number to generate identical sequence of random number for PV
     //AMHM End
 

@@ -218,6 +218,8 @@ class Cache : public BaseCache
     bool alreadyCalculatedStatsOperation;
     uint8_t * new_data;
     uint8_t * old_data;
+    uint8_t * Transitions0To1;
+    uint8_t * Transitions1To0;
     //AMHM End
     
     FuncPageTable *myPageTable;

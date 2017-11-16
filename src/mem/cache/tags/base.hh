@@ -192,6 +192,7 @@ class BaseTags : public ClockedObject
     //Fault injection flag: 0: Disable 1: Enable
     bool faultInjection;
     bool approximation;
+    bool PEA;
     //AMHM End
 
     /**

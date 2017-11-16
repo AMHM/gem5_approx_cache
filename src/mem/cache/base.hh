@@ -338,8 +338,6 @@ class BaseCache : public MemObject
     Stats::Scalar totalNumberOfReads;
     //Total number of writes in cache
     Stats::Scalar totalNumberOfWrites;
-    //Total dynamic energy consumption
-    Stats::Scalar totlaDynamicEnergyConsumption;
     //Total number of write failure injected faults
     Stats::Scalar totalNumberOfWriteErrorFaultInjection;
     //Total number of read disturbance injected faults
@@ -358,6 +356,12 @@ class BaseCache : public MemObject
 	Stats::Scalar totalNumberOfWriteR3;
 	//Total number of writebacks in this cache
 	Stats::Scalar totalNumberOfWriteback;
+	//Total number of 0to1 transitions
+	Stats::Scalar totalNumberOf0to1;
+	//Total number of 1to0 transitions
+	Stats::Scalar totalNumberOf1to0;
+	//Total number of steady bits
+	Stats::Scalar totalNumberOfSteady;
     //AMHM End
 
     // Statistics

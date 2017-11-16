@@ -58,7 +58,7 @@ class BaseCache(MemObject):
     #AMHM Start
     write_latency = Param.Cycles("The write latency for this cache")
     outdir = Param.String("gem5 output directory")
-    address_lookup_latemcy = Param.Cycles("Approx table to TLB address lookup latency for this cache")
+    address_lookup_latency = Param.Cycles("Approx table to TLB address lookup latency for this cache")
     sttmram = Param.String("STT-MRAM parameters and config files path")
     #AMHM End
 

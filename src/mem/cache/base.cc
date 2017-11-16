@@ -75,7 +75,7 @@ BaseCache::BaseCache(const BaseCacheParams *p, unsigned blk_size)
       lookupLatency(p->hit_latency),
       //AMHM Start
       writeLatency(p->write_latency),
-	  addressLookupLatency(p->address_lookup_latemcy),
+	  addressLookupLatency(p->address_lookup_latency),
       //AMHM End
       forwardLatency(p->hit_latency),
       fillLatency(p->response_latency),
@@ -193,10 +193,6 @@ BaseCache::regStats()
         .name(name() + ".totalNumberOfWrites")
         .desc("AMHM: Total Number of Physical Write Operations in STT-RAM Cache Lines")
         ;
-    totlaDynamicEnergyConsumption
-        .name(name() + ".totlaDynamicEnergyConsumption")
-        .desc("AMHM: Total dynamic energy consumption of this cache (pJ)")
-        ;
     totalNumberOfWriteErrorFaultInjection
         .name(name() + ".totalNumberOfWriteErrorFaultInjection")
         .desc("AMHM: Total number of write failure injected faults")
@@ -232,6 +228,18 @@ BaseCache::regStats()
     totalNumberOfWriteback
 			.name(name() + ".totalNumberOfWriteback")
 			.desc("AMHM: Total number of dirty block writebacks in cache")
+			;
+    totalNumberOf0to1
+			.name(name() + ".totalNumberOf0to1")
+			.desc("AMHM: Total number of 0 to 1 transitions")
+			;
+    totalNumberOf1to0
+			.name(name() + ".totalNumberOf1to0")
+			.desc("AMHM: Total number of 1 to 0 transitions")
+			;
+    totalNumberOfSteady
+			.name(name() + ".totalNumberOfSteady")
+			.desc("AMHM: Total number of Steady transitions")
 			;
     //AMHM End
 

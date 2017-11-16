@@ -523,6 +523,10 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
 								if(name() == "system.l2.tags")
 									faultInjection = temp_flag;
 							}
+    	            		else if(!strcmp(stringTemp0, "PEA")) {
+    	            			if((name() == "system.cpu.dcache.tags")||(name() == "system.cpu0.dcache.tags")||(name() == "system.cpu1.dcache.tags")||(name() == "system.cpu2.dcache.tags")||(name() == "system.cpu3.dcache.tags"))
+									PEA = temp_flag;
+							}
     	            		else {
 								printf("Errors in reading STT-RAM fault injection config file!(1)\n");
 								break;
@@ -597,6 +601,7 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
             blk->way = j;
 
             //AMHM Start
+            blk->reliabilityLevel = 0; //default reliability level for all blocks!
             blk->randSeed = i * j;
             srand(blk->randSeed); //each block has its own seed number!
             for (int t = 0; t < (blkSize * 8); ++t)
@@ -664,84 +669,10 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
               } else {
                 blk->writeErrorRateLevel3[t] = writeErrorRateLevel3 + (((double) (rand() % 100) / 100) * writeErrorRateLevel3Var) * writeErrorRateLevel3;
               }
-
-              //dynamicReadEnergyConsumptionLevel0
-              if ((rand()%100) >= 50) {
-                blk->dynamicReadEnergyConsumptionLevel0[t] = dynamicReadEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel0Var) * dynamicReadEnergyConsumptionLevel0;
-                
-              } else {
-                blk->dynamicReadEnergyConsumptionLevel0[t] = dynamicReadEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel0Var) * dynamicReadEnergyConsumptionLevel0;
-              }
-
-              //dynamicReadEnergyConsumptionLevel1
-              if ((rand()%100) >= 50) {
-                blk->dynamicReadEnergyConsumptionLevel1[t] = dynamicReadEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel1Var) * dynamicReadEnergyConsumptionLevel1;
-                
-              } else {
-                blk->dynamicReadEnergyConsumptionLevel1[t] = dynamicReadEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel1Var) * dynamicReadEnergyConsumptionLevel1;
-              }
-
-              //dynamicReadEnergyConsumptionLevel2
-              if ((rand()%100) >= 50) {
-                blk->dynamicReadEnergyConsumptionLevel2[t] = dynamicReadEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel2Var) * dynamicReadEnergyConsumptionLevel2;
-                
-              } else {
-                blk->dynamicReadEnergyConsumptionLevel2[t] = dynamicReadEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel2Var) * dynamicReadEnergyConsumptionLevel2;
-              }
-
-              //dynamicReadEnergyConsumptionLevel3
-              if ((rand()%100) >= 50) {
-                blk->dynamicReadEnergyConsumptionLevel3[t] = dynamicReadEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel3Var) * dynamicReadEnergyConsumptionLevel3;
-                
-              } else {
-                blk->dynamicReadEnergyConsumptionLevel3[t] = dynamicReadEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicReadEnergyConsumptionLevel3Var) * dynamicReadEnergyConsumptionLevel3;
-              }
-
-              //dynamicWriteEnergyConsumptionLevel0
-              if ((rand()%100) >= 50) {
-                blk->dynamicWriteEnergyConsumptionLevel0[t] = dynamicWriteEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel0Var) * dynamicWriteEnergyConsumptionLevel0;
-                
-              } else {
-                blk->dynamicWriteEnergyConsumptionLevel0[t] = dynamicWriteEnergyConsumptionLevel0 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel0Var) * dynamicWriteEnergyConsumptionLevel0;
-              }
-
-              //dynamicWriteEnergyConsumptionLevel1
-              if ((rand()%100) >= 50) {
-                blk->dynamicWriteEnergyConsumptionLevel1[t] = dynamicWriteEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel1Var) * dynamicWriteEnergyConsumptionLevel1;
-                
-              } else {
-                blk->dynamicWriteEnergyConsumptionLevel1[t] = dynamicWriteEnergyConsumptionLevel1 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel1Var) * dynamicWriteEnergyConsumptionLevel1;
-              }
-
-              //dynamicWriteEnergyConsumptionLevel2
-              if ((rand()%100) >= 50) {
-                blk->dynamicWriteEnergyConsumptionLevel2[t] = dynamicWriteEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel2Var) * dynamicWriteEnergyConsumptionLevel2;
-                
-              } else {
-                blk->dynamicWriteEnergyConsumptionLevel2[t] = dynamicWriteEnergyConsumptionLevel2 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel2Var) * dynamicWriteEnergyConsumptionLevel2;
-              }
-
-              //dynamicWriteEnergyConsumptionLevel3
-              if ((rand()%100) >= 50) {
-                blk->dynamicWriteEnergyConsumptionLevel3[t] = dynamicWriteEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel3Var) * dynamicWriteEnergyConsumptionLevel3;
-                
-              } else {
-                blk->dynamicWriteEnergyConsumptionLevel3[t] = dynamicWriteEnergyConsumptionLevel3 + (((double) (rand() % 100) / 100) * dynamicWriteEnergyConsumptionLevel3Var) * dynamicWriteEnergyConsumptionLevel3;
-              }
             }
             //AMHM End
         }
     }
-cout<<name()<<"\n";
-printf("dynamicReadEnergyConsumptionLevel0: %le\n", dynamicReadEnergyConsumptionLevel0);
-printf("dynamicWriteEnergyConsumptionLevel0:%le\n", dynamicWriteEnergyConsumptionLevel0);
-printf("dynamicReadEnergyConsumptionLevel1: %le\n", dynamicReadEnergyConsumptionLevel1);
-printf("dynamicWriteEnergyConsumptionLevel1:%le\n", dynamicWriteEnergyConsumptionLevel1);
-printf("dynamicReadEnergyConsumptionLevel2: %le\n", dynamicReadEnergyConsumptionLevel2);
-printf("dynamicWriteEnergyConsumptionLevel2:%le\n", dynamicWriteEnergyConsumptionLevel2);
-printf("dynamicReadEnergyConsumptionLevel3: %le\n", dynamicReadEnergyConsumptionLevel3);
-printf("dynamicWriteEnergyConsumptionLevel3:%le\n", dynamicWriteEnergyConsumptionLevel3);
-cout<<"#################################################################################\n";
 }
 
 BaseSetAssoc::~BaseSetAssoc()

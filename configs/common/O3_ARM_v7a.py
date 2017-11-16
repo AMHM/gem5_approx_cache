@@ -150,7 +150,7 @@ class O3_ARM_v7a_ICache(Cache):
     hit_latency = 1
     response_latency = 1
     write_latency = 1
-    address_lookup_latemcy = 1
+    address_lookup_latency = 0.5
     mshrs = 2
     tgts_per_mshr = 8
     size = '32kB'
@@ -164,7 +164,7 @@ class O3_ARM_v7a_DCache(Cache):
     hit_latency = 2
     response_latency = 2
     write_latency = 2
-    address_lookup_latemcy = 1
+    address_lookup_latency = 0.5
     mshrs = 6
     tgts_per_mshr = 8
     size = '32kB'
@@ -192,7 +192,7 @@ class O3_ARM_v7aL2(Cache):
     hit_latency = 12
     response_latency = 12
     write_latency = 20
-    address_lookup_latemcy = 1
+    address_lookup_latency = 0.5
     write-la
     mshrs = 16
     tgts_per_mshr = 8
