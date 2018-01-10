@@ -733,156 +733,152 @@ BaseSetAssoc::wayAccessAnalysisOutput()
 	double averageWayL1Ratio = 0;
 	double averageWayL2Ratio = 0;
 	double averageWayL3Ratio = 0;
-
-	if(name()=="system.l2.tags")
-	{
-		FILE * setAccess;
-		FILE * wayAccess;
-		char filename0[160];
-		snprintf(filename0,160,"%s/setAccessAnalysis.csv",outdir.data());
-		setAccess = fopen(filename0,"a");
-		if (setAccess==NULL) {
-		    printf("The set analysis file could not be opened!\n");
-		    return;
-		}else{
-			fprintf(setAccess,"\n\n");
-			fprintf(setAccess," ,");
-			for (unsigned i = 0; i < numSets; ++i)
-				fprintf(setAccess,"%d,",i);
-			fprintf(setAccess,"\n");
-			fprintf(setAccess,"L0,");
-			for (unsigned i = 0; i < numSets; ++i){
-				if(sets[i].totalAccesses == 0){
-					fprintf(setAccess,"NO_ACCESS,");
-					continue;
-				}
-				fprintf(setAccess,"%f,",(double) sets[i].L0Accesses / sets[i].totalAccesses);
+	FILE * setAccess;
+	FILE * wayAccess;
+	char filename0[160];
+	snprintf(filename0,160,"%s/setAccessAnalysis_%s.csv",outdir.data(),name().c_str());
+	setAccess = fopen(filename0,"a");
+	if (setAccess==NULL) {
+		printf("The set analysis file could not be opened!\n");
+		return;
+	}else{
+		fprintf(setAccess,"\n\n");
+		fprintf(setAccess," ,");
+		for (unsigned i = 0; i < numSets; ++i)
+			fprintf(setAccess,"%d,",i);
+		fprintf(setAccess,"\n");
+		fprintf(setAccess,"L0,");
+		for (unsigned i = 0; i < numSets; ++i){
+			if(sets[i].totalAccesses == 0){
+				fprintf(setAccess,"NO_ACCESS,");
+				continue;
 			}
-			fprintf(setAccess,"\n");
-			fprintf(setAccess,"L1,");
-			for (unsigned i = 0; i < numSets; ++i){
-				if(sets[i].totalAccesses == 0){
-					fprintf(setAccess,"NO_ACCESS,");
-					continue;
-				}
-				fprintf(setAccess,"%f,",(double) sets[i].L1Accesses / sets[i].totalAccesses);
-			}
-			fprintf(setAccess,"\n");
-			fprintf(setAccess,"L2,");
-			for (unsigned i = 0; i < numSets; ++i){
-				if(sets[i].totalAccesses == 0){
-					fprintf(setAccess,"NO_ACCESS,");
-					continue;
-				}
-				fprintf(setAccess,"%f,",(double) sets[i].L2Accesses / sets[i].totalAccesses);
-			}
-			fprintf(setAccess,"\n");
-			fprintf(setAccess,"L3,");
-			for (unsigned i = 0; i < numSets; ++i){
-				if(sets[i].totalAccesses == 0){
-					fprintf(setAccess,"NO_ACCESS,");
-					continue;
-				}
-				fprintf(setAccess,"%f,",(double) sets[i].L3Accesses / sets[i].totalAccesses);
-			}
-			fprintf(setAccess,"\n");
-			for (unsigned i = 0; i < numSets; ++i){
-				sets[i].L0Accesses = 0;
-				sets[i].L1Accesses = 0;
-				sets[i].L2Accesses = 0;
-				sets[i].L3Accesses = 0;
-				sets[i].totalAccesses = 0;
-			}
-			fclose(setAccess);
+			fprintf(setAccess,"%f,",(double) sets[i].L0Accesses / sets[i].totalAccesses);
 		}
-		char filename1[160];
-		snprintf(filename1,160,"%s/wayAccessAnalysis.csv",outdir.data());
-		wayAccess = fopen(filename1,"a");
-		if (wayAccess==NULL) {
-			printf("The way analysis file could not be opened!\n");
-			return;
-		}else{
-			fprintf(wayAccess,"\n\n");
-			fprintf(wayAccess," ,");
-			for (unsigned i = 0; i < assoc; ++i)
-				fprintf(wayAccess,"%d,",i);
-			fprintf(wayAccess,"\n");
-			fprintf(wayAccess,"L0,");
-			for (unsigned i = 0; i < assoc; ++i){
-				if(cacheWay[i].totalAccess == 0){
-					fprintf(wayAccess,"NO_ACCESS,");
-					continue;
-				}
-				averageWayL0Ratio += (double) cacheWay[i].L0Accesses / cacheWay[i].totalAccess;
-				fprintf(wayAccess,"%f,",(double) cacheWay[i].L0Accesses / cacheWay[i].totalAccess);
+		fprintf(setAccess,"\n");
+		fprintf(setAccess,"L1,");
+		for (unsigned i = 0; i < numSets; ++i){
+			if(sets[i].totalAccesses == 0){
+				fprintf(setAccess,"NO_ACCESS,");
+				continue;
 			}
-			fprintf(wayAccess,"\n");
-			fprintf(wayAccess,"L1,");
-			for (unsigned i = 0; i < assoc; ++i){
-				if(cacheWay[i].totalAccess == 0){
-					fprintf(wayAccess,"NO_ACCESS,");
-					continue;
-				}
-				averageWayL1Ratio += (double) cacheWay[i].L1Accesses / cacheWay[i].totalAccess;
-				fprintf(wayAccess,"%f,",(double) cacheWay[i].L1Accesses / cacheWay[i].totalAccess);
-			}
-			fprintf(wayAccess,"\n");
-			fprintf(wayAccess,"L2,");
-			for (unsigned i = 0; i < assoc; ++i){
-				if(cacheWay[i].totalAccess == 0){
-					fprintf(wayAccess,"NO_ACCESS,");
-					continue;
-				}
-				averageWayL2Ratio += (double) cacheWay[i].L2Accesses / cacheWay[i].totalAccess;
-				fprintf(wayAccess,"%f,",(double) cacheWay[i].L2Accesses / cacheWay[i].totalAccess);
-			}
-			fprintf(wayAccess,"\n");
-			fprintf(wayAccess,"L3,");
-			for (unsigned i = 0; i < assoc; ++i){
-				if(cacheWay[i].totalAccess == 0){
-					fprintf(wayAccess,"NO_ACCESS,");
-					continue;
-				}
-				averageWayL3Ratio += (double) cacheWay[i].L3Accesses / cacheWay[i].totalAccess;
-				fprintf(wayAccess,"%f,",(double) cacheWay[i].L3Accesses / cacheWay[i].totalAccess);
-			}
-			fprintf(wayAccess,"\n");
-			for (unsigned i = 0; i < assoc; ++i){
-				cacheWay[i].L0Accesses = 0;
-				cacheWay[i].L1Accesses = 0;
-				cacheWay[i].L2Accesses = 0;
-				cacheWay[i].L3Accesses = 0;
-				cacheWay[i].totalAccess = 0;
-			}
-			if(averageL0Access.zero())
-					averageL0Access = (double) averageWayL0Ratio / assoc;
-			else {
-				if(averageWayL0Ratio != 0)
-					averageL0Access = (averageL0Access.value() + ((double) averageWayL0Ratio / assoc)) / 2;
-			}
-
-			if(averageL1Access.zero())
-				averageL1Access = (double) averageWayL1Ratio / assoc;
-			else {
-				if(averageWayL1Ratio != 0)
-					averageL1Access = (averageL1Access.value() + ((double) averageWayL1Ratio / assoc)) / 2;
-			}
-
-			if(averageL2Access.zero())
-				averageL2Access = (double) averageWayL2Ratio / assoc;
-			else {
-				if(averageWayL2Ratio != 0)
-					averageL2Access = (averageL2Access.value() + ((double) averageWayL2Ratio / assoc)) / 2;
-			}
-
-			if(averageL3Access.zero())
-				averageL3Access = (double) averageWayL3Ratio / assoc;
-			else {
-				if(averageWayL3Ratio != 0)
-					averageL3Access = (averageL3Access.value() + ((double) averageWayL3Ratio / assoc)) / 2;
-			}
-			fclose(wayAccess);
+			fprintf(setAccess,"%f,",(double) sets[i].L1Accesses / sets[i].totalAccesses);
 		}
+		fprintf(setAccess,"\n");
+		fprintf(setAccess,"L2,");
+		for (unsigned i = 0; i < numSets; ++i){
+			if(sets[i].totalAccesses == 0){
+				fprintf(setAccess,"NO_ACCESS,");
+				continue;
+			}
+			fprintf(setAccess,"%f,",(double) sets[i].L2Accesses / sets[i].totalAccesses);
+		}
+		fprintf(setAccess,"\n");
+		fprintf(setAccess,"L3,");
+		for (unsigned i = 0; i < numSets; ++i){
+			if(sets[i].totalAccesses == 0){
+				fprintf(setAccess,"NO_ACCESS,");
+				continue;
+			}
+			fprintf(setAccess,"%f,",(double) sets[i].L3Accesses / sets[i].totalAccesses);
+		}
+		fprintf(setAccess,"\n");
+		for (unsigned i = 0; i < numSets; ++i){
+			sets[i].L0Accesses = 0;
+			sets[i].L1Accesses = 0;
+			sets[i].L2Accesses = 0;
+			sets[i].L3Accesses = 0;
+			sets[i].totalAccesses = 0;
+		}
+		fclose(setAccess);
+	}
+	char filename1[160];
+	snprintf(filename1,160,"%s/wayAccessAnalysis_%s.csv",outdir.data(),name().c_str());
+	wayAccess = fopen(filename1,"a");
+	if (wayAccess==NULL) {
+		printf("The way analysis file could not be opened!\n");
+		return;
+	}else{
+		fprintf(wayAccess,"\n\n");
+		fprintf(wayAccess," ,");
+		for (unsigned i = 0; i < assoc; ++i)
+			fprintf(wayAccess,"%d,",i);
+		fprintf(wayAccess,"\n");
+		fprintf(wayAccess,"L0,");
+		for (unsigned i = 0; i < assoc; ++i){
+			if(cacheWay[i].totalAccess == 0){
+				fprintf(wayAccess,"NO_ACCESS,");
+				continue;
+			}
+			averageWayL0Ratio += (double) cacheWay[i].L0Accesses / cacheWay[i].totalAccess;
+			fprintf(wayAccess,"%f,",(double) cacheWay[i].L0Accesses / cacheWay[i].totalAccess);
+		}
+		fprintf(wayAccess,"\n");
+		fprintf(wayAccess,"L1,");
+		for (unsigned i = 0; i < assoc; ++i){
+			if(cacheWay[i].totalAccess == 0){
+				fprintf(wayAccess,"NO_ACCESS,");
+				continue;
+			}
+			averageWayL1Ratio += (double) cacheWay[i].L1Accesses / cacheWay[i].totalAccess;
+			fprintf(wayAccess,"%f,",(double) cacheWay[i].L1Accesses / cacheWay[i].totalAccess);
+		}
+		fprintf(wayAccess,"\n");
+		fprintf(wayAccess,"L2,");
+		for (unsigned i = 0; i < assoc; ++i){
+			if(cacheWay[i].totalAccess == 0){
+				fprintf(wayAccess,"NO_ACCESS,");
+				continue;
+			}
+			averageWayL2Ratio += (double) cacheWay[i].L2Accesses / cacheWay[i].totalAccess;
+			fprintf(wayAccess,"%f,",(double) cacheWay[i].L2Accesses / cacheWay[i].totalAccess);
+		}
+		fprintf(wayAccess,"\n");
+		fprintf(wayAccess,"L3,");
+		for (unsigned i = 0; i < assoc; ++i){
+			if(cacheWay[i].totalAccess == 0){
+				fprintf(wayAccess,"NO_ACCESS,");
+				continue;
+			}
+			averageWayL3Ratio += (double) cacheWay[i].L3Accesses / cacheWay[i].totalAccess;
+			fprintf(wayAccess,"%f,",(double) cacheWay[i].L3Accesses / cacheWay[i].totalAccess);
+		}
+		fprintf(wayAccess,"\n");
+		for (unsigned i = 0; i < assoc; ++i){
+			cacheWay[i].L0Accesses = 0;
+			cacheWay[i].L1Accesses = 0;
+			cacheWay[i].L2Accesses = 0;
+			cacheWay[i].L3Accesses = 0;
+			cacheWay[i].totalAccess = 0;
+		}
+		if(averageL0Access.zero())
+				averageL0Access = (double) averageWayL0Ratio / assoc;
+		else {
+			if(averageWayL0Ratio != 0)
+				averageL0Access = (averageL0Access.value() + ((double) averageWayL0Ratio / assoc)) / 2;
+		}
+
+		if(averageL1Access.zero())
+			averageL1Access = (double) averageWayL1Ratio / assoc;
+		else {
+			if(averageWayL1Ratio != 0)
+				averageL1Access = (averageL1Access.value() + ((double) averageWayL1Ratio / assoc)) / 2;
+		}
+
+		if(averageL2Access.zero())
+			averageL2Access = (double) averageWayL2Ratio / assoc;
+		else {
+			if(averageWayL2Ratio != 0)
+				averageL2Access = (averageL2Access.value() + ((double) averageWayL2Ratio / assoc)) / 2;
+		}
+
+		if(averageL3Access.zero())
+			averageL3Access = (double) averageWayL3Ratio / assoc;
+		else {
+			if(averageWayL3Ratio != 0)
+				averageL3Access = (averageL3Access.value() + ((double) averageWayL3Ratio / assoc)) / 2;
+		}
+		fclose(wayAccess);
 	}
 }
 

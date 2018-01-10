@@ -40,7 +40,7 @@
 namespace Stats {
 
 /** All counters are of 64-bit values. */
-typedef double Counter;
+typedef long double Counter;
 /** vector of counters. */
 typedef std::vector<Counter> VCounter;
 /** map of counters */
@@ -49,7 +49,7 @@ typedef std::map<Counter, int> MCounter;
 typedef std::numeric_limits<Counter> CounterLimits;
 
 /** All results are doubles. */
-typedef double Result;
+typedef long double Result;
 /** vector of results. */
 typedef std::vector<Result> VResult;
 

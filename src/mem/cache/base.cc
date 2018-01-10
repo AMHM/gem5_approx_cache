@@ -225,6 +225,22 @@ BaseCache::regStats()
     		.name(name() + ".totalNumberOfWriteR3")
     		.desc("AMHM: Total number of writes in reliability level 3 mode in cache")
     		;
+	L0AccessRatio
+            .name(name() + ".L0AccessRatio")
+            .desc("AMHM: Ratio of L0 accesses to this cache")
+            ;
+    L1AccessRatio
+            .name(name() + ".L1AccessRatio")
+            .desc("AMHM: Ratio of L1 accesses to this cache")
+            ;
+	L2AccessRatio
+            .name(name() + ".L2AccessRatio")
+            .desc("AMHM: Ratio of L2 accesses to this cache")
+            ;
+	L3AccessRatio
+            .name(name() + ".L3AccessRatio")
+            .desc("AMHM: Ratio of L3 accesses to this cache")
+            ;
     totalNumberOfWriteback
 			.name(name() + ".totalNumberOfWriteback")
 			.desc("AMHM: Total number of dirty block writebacks in cache")
@@ -240,6 +256,54 @@ BaseCache::regStats()
     totalNumberOfSteady
 			.name(name() + ".totalNumberOfSteady")
 			.desc("AMHM: Total number of Steady transitions")
+			;
+	R0totalNumberOf0to1
+			.name(name() + ".R0totalNumberOf0to1")
+			.desc("AMHM: Total number of 0 to 1 transitions for R0")
+			;
+    R0totalNumberOf1to0
+			.name(name() + ".R0totalNumberOf1to0")
+			.desc("AMHM: Total number of 1 to 0 transitions for R0")
+			;
+    R0totalNumberOfSteady
+			.name(name() + ".R0totalNumberOfSteady")
+			.desc("AMHM: Total number of Steady transitions for R0")
+			;
+	R1totalNumberOf0to1
+			.name(name() + ".R1totalNumberOf0to1")
+			.desc("AMHM: Total number of 0 to 1 transitions for R1")
+			;
+    R1totalNumberOf1to0
+			.name(name() + ".R1totalNumberOf1to0")
+			.desc("AMHM: Total number of 1 to 0 transitions for R1")
+			;
+    R1totalNumberOfSteady
+			.name(name() + ".R1totalNumberOfSteady")
+			.desc("AMHM: Total number of Steady transitions for R1")
+			;
+	R2totalNumberOf0to1
+			.name(name() + ".R2totalNumberOf0to1")
+			.desc("AMHM: Total number of 0 to 1 transitions for R2")
+			;
+    R2totalNumberOf1to0
+			.name(name() + ".R2totalNumberOf1to0")
+			.desc("AMHM: Total number of 1 to 0 transitions for R2")
+			;
+    R2totalNumberOfSteady
+			.name(name() + ".R2totalNumberOfSteady")
+			.desc("AMHM: Total number of Steady transitions for R2")
+			;
+	R3totalNumberOf0to1
+			.name(name() + ".R3totalNumberOf0to1")
+			.desc("AMHM: Total number of 0 to 1 transitions for R3")
+			;
+    R3totalNumberOf1to0
+			.name(name() + ".R3totalNumberOf1to0")
+			.desc("AMHM: Total number of 1 to 0 transitions for R3")
+			;
+    R3totalNumberOfSteady
+			.name(name() + ".R3totalNumberOfSteady")
+			.desc("AMHM: Total number of Steady transitions for R3")
 			;
     //AMHM End
 

@@ -235,12 +235,52 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
             //write failure fault injection
             for (int i = 0; i < blkSize; i++)
                 for (int j = 0; j < 8; j++) {
-                		 if((Transitions0To1[i] & 0x01) == 1)
-                			 totalNumberOf0to1++;
-                		 else if((Transitions1To0[i] & 0x01) == 1)
+                		 if((Transitions0To1[i] & 0x01) == 1) {
+                			totalNumberOf0to1++;
+							switch (pkt->reliabilityLevel) {
+								case 0 : R0totalNumberOf0to1++;
+										 break;
+								case 1 : R1totalNumberOf0to1++;
+										 break;
+								case 2 : R2totalNumberOf0to1++;
+										 break;
+								case 3 : R3totalNumberOf0to1++;
+										 break;
+								default : printf("AMHM: Invalid reliability level!\n");
+										 break;  
+							}
+							 
+						}
+                		 else if((Transitions1To0[i] & 0x01) == 1) {
                 			 totalNumberOf1to0++;
-                		 else
+							 switch (pkt->reliabilityLevel) {
+								case 0 : R0totalNumberOf1to0++;
+										 break;
+								case 1 : R1totalNumberOf1to0++;
+										 break;
+								case 2 : R2totalNumberOf1to0++;
+										 break;
+								case 3 : R3totalNumberOf1to0++;
+										 break;
+								default : printf("AMHM: Invalid reliability level!\n");
+										 break;  
+							}
+						}
+                		 else {
                 			 totalNumberOfSteady++;
+							 switch (pkt->reliabilityLevel) {
+								case 0 : R0totalNumberOfSteady++;
+										 break;
+								case 1 : R1totalNumberOfSteady++;
+										 break;
+								case 2 : R2totalNumberOfSteady++;
+										 break;
+								case 3 : R3totalNumberOfSteady++;
+										 break;
+								default : printf("AMHM: Invalid reliability level!\n");
+										 break; 
+							}
+						}
                 		 Transitions0To1[i] = Transitions0To1[i] >> 1;
                 		 Transitions1To0[i] = Transitions1To0[i] >> 1;
                          switch (pkt->reliabilityLevel) {
@@ -259,7 +299,7 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                           } 
-                         if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (tags->faultInjection))
+                         if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3)) && (tags->faultInjection))
                             if(((double) (rand() % RAND_MAX) / RAND_MAX) < writeErrorRate) {
                                 new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                                 totalNumberOfWriteErrorFaultInjection++;
@@ -267,8 +307,6 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
 
                 }
             switch (pkt->reliabilityLevel) {
-            	case 0 : totalNumberOfWrites++;
-            			 break;
             	case 1 : totalNumberOfWriteR1++;
             			 totalNumberOfWrites++;
             	         break;
@@ -278,7 +316,8 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
             	case 3 : totalNumberOfWriteR3++;
 						 totalNumberOfWrites++;
 						 break;
-            	default : break;
+            	default :totalNumberOfWrites++;
+            			 break;
             }
     }
     else {//read
@@ -300,15 +339,13 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
                             default : printf("AMHM: Invalid reliability level!\n");
                                       break;  
                     }  
-                    if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3))&& (tags->faultInjection))
+                    if(((pkt->reliabilityLevel == 1) || (pkt->reliabilityLevel == 2) || (pkt->reliabilityLevel == 3)) && (tags->faultInjection))
                           if(((double) (rand() % RAND_MAX) / RAND_MAX) < readErrorRate) {
                               new_data[i] = new_data[i] ^ randomBitSet[j]; // injecting one fault!
                               totalNumberOfReadDisturbedBits++;
                           }
                 }
             switch (pkt->reliabilityLevel) {
-				case 0 : totalNumberOfReads++;
-						 break;
 				case 1 : totalNumberOfReadR1++;
 						 totalNumberOfReads++;
 						 break;
@@ -318,11 +355,20 @@ Cache::STTRAMFaultInjectionAndEnergyCalculation(CacheBlk *blk, PacketPtr pkt, bo
 				case 3 : totalNumberOfReadR3++;
 						 totalNumberOfReads++;
 						 break;
-				default : break;
+				default :totalNumberOfReads++;
+				 	 	 break;
 			}
     }
     //applying the faults
-
+	if ((totalNumberOfReads.value() + totalNumberOfWrites.value()) != 0)
+	{
+		L0AccessRatio = (totalNumberOfReads.value() + totalNumberOfWrites.value() - totalNumberOfReadR1.value() - totalNumberOfReadR2.value()
+						- totalNumberOfReadR3.value() - totalNumberOfWriteR1.value() - totalNumberOfWriteR2.value() - totalNumberOfWriteR3.value())
+						/ (totalNumberOfReads.value() + totalNumberOfWrites.value());
+		L1AccessRatio = (totalNumberOfReadR1.value() + totalNumberOfWriteR1.value()) / (totalNumberOfReads.value() + totalNumberOfWrites.value());
+		L2AccessRatio = (totalNumberOfReadR2.value() + totalNumberOfWriteR2.value()) / (totalNumberOfReads.value() + totalNumberOfWrites.value());
+		L3AccessRatio = (totalNumberOfReadR3.value() + totalNumberOfWriteR3.value()) / (totalNumberOfReads.value() + totalNumberOfWrites.value());
+	}
   	if(blk!=nullptr){
 	  //Saving the reliability level information in related field
 	  blk->reliabilityLevel = pkt->reliabilityLevel;

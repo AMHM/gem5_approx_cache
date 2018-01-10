@@ -354,6 +354,14 @@ class BaseCache : public MemObject
 	Stats::Scalar totalNumberOfWriteR2;
 	//Total number of writes in reliability level 3 mode in cache
 	Stats::Scalar totalNumberOfWriteR3;
+	// L0 access ratio
+	Stats::Scalar L0AccessRatio;
+	// L1 access ratio
+    Stats::Scalar L1AccessRatio;
+	// L2 access ratio
+    Stats::Scalar L2AccessRatio;
+	// L3 access ratio
+    Stats::Scalar L3AccessRatio;
 	//Total number of writebacks in this cache
 	Stats::Scalar totalNumberOfWriteback;
 	//Total number of 0to1 transitions
@@ -362,6 +370,30 @@ class BaseCache : public MemObject
 	Stats::Scalar totalNumberOf1to0;
 	//Total number of steady bits
 	Stats::Scalar totalNumberOfSteady;
+	//Total number of 0to1 transitions for R0
+	Stats::Scalar R0totalNumberOf0to1;
+	//Total number of 1to0 transitions for R0
+	Stats::Scalar R0totalNumberOf1to0;
+	//Total number of steady bits for R0
+	Stats::Scalar R0totalNumberOfSteady;
+	//Total number of 0to1 transitions for R1
+	Stats::Scalar R1totalNumberOf0to1;
+	//Total number of 1to0 transitions for R1
+	Stats::Scalar R1totalNumberOf1to0;
+	//Total number of steady bits for R1
+	Stats::Scalar R1totalNumberOfSteady;
+	//Total number of 0to1 transitions for R2
+	Stats::Scalar R2totalNumberOf0to1;
+	//Total number of 1to0 transitions for R2
+	Stats::Scalar R2totalNumberOf1to0;
+	//Total number of steady bits for R2
+	Stats::Scalar R2totalNumberOfSteady;
+	//Total number of 0to1 transitions for R3
+	Stats::Scalar R3totalNumberOf0to1;
+	//Total number of 1to0 transitions for R3
+	Stats::Scalar R3totalNumberOf1to0;
+	//Total number of steady bits for R3
+	Stats::Scalar R3totalNumberOfSteady;
     //AMHM End
 
     // Statistics
