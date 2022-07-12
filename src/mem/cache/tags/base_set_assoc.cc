@@ -81,9 +81,9 @@ BaseSetAssoc::BaseSetAssoc(const Params *p)
 
     //AMHM Start
     FILE * STTRAMCellConfig;
-    STTRAMCellConfig = fopen ("//data//users//monazzah//gem5-approx-cache//configs//common//STT-RAMCacheConfig.cfg", "r");
+    STTRAMCellConfig = fopen ("//home//ubuntu//gem5_approx_cache//configs//common//STT-RAMCacheConfig.cfg", "r");
     FILE * STTRAMFIConfig;
-    STTRAMFIConfig = fopen ("//data//users//monazzah//gem5-approx-cache//configs//common//STTRAMFIConfig.cfg", "r");
+    STTRAMFIConfig = fopen ("//home//ubuntu//gem5_approx_cache//configs//common//STTRAMFIConfig.cfg", "r");
     char stringTemp0[500];
     char stringTemp1[500];
     double value1 = 0;
